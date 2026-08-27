@@ -1,0 +1,16 @@
+.env
+.env.local
+__pycache__/
+*.pyc
+.venv/
+venv/
+node_modules/
+dist/
+.DS_Store
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+terraform/.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
