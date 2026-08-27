@@ -48,7 +48,7 @@ function App() {
         uploading={uploading}
         uploadError={uploadError}
       />
-      <main className="flex-1 overflow-hidden bg-slate-50 dark:bg-slate-950">
+      <main className="premium-bg flex-1 overflow-hidden bg-slate-50 dark:bg-slate-950">
         <QueryPanel
           selectedDocumentId={selectedDocumentId}
           selectedDocumentLabel={selectedDocumentLabel}

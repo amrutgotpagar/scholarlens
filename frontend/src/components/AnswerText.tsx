@@ -23,7 +23,7 @@ function linkifyCitations(text: string, validRefIds: Set<number>): string {
 
 export function AnswerText({ text, validRefIds, onCitationClick }: Props) {
   return (
-    <div className="prose prose-slate dark:prose-invert prose-p:leading-relaxed prose-p:my-3 first:prose-p:mt-0 max-w-none text-[15px]">
+    <div className="prose prose-slate dark:prose-invert prose-p:leading-relaxed prose-p:my-3 first:prose-p:mt-0 prose-strong:font-semibold prose-strong:text-slate-900 dark:prose-strong:text-white max-w-none font-serif text-[16.5px]">
       <ReactMarkdown
         // react-markdown's default sanitizer blanks any URL scheme it doesn't recognize
         // (http/https/mailto/etc.) — our synthetic "cite:1" hrefs need an explicit carve-out
@@ -37,7 +37,7 @@ export function AnswerText({ text, validRefIds, onCitationClick }: Props) {
                 <button
                   type="button"
                   onClick={() => onCitationClick(refId)}
-                  className="mx-0.5 rounded bg-indigo-100 px-1 py-0.5 font-mono text-xs font-medium text-indigo-700 no-underline hover:bg-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-300 dark:hover:bg-indigo-500/30"
+                  className="mx-0.5 rounded-md bg-indigo-100 px-1.5 py-0.5 font-mono text-xs font-medium text-indigo-700 no-underline transition-colors hover:bg-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-300 dark:hover:bg-indigo-500/30"
                 >
                   {children}
                 </button>

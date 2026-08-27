@@ -21,14 +21,14 @@ export function SourcesPanel({ citations, highlightedRefId }: Props) {
             <div
               key={citation.ref_id}
               id={`source-${citation.ref_id}`}
-              className={`scroll-mt-4 rounded-xl border p-3.5 text-sm transition-all duration-300 ${
+              className={`scroll-mt-4 rounded-xl border border-l-[3px] bg-white p-3.5 text-sm shadow-sm transition-all duration-300 dark:bg-slate-900 ${
                 isHighlighted
-                  ? 'border-indigo-300 bg-indigo-50/80 ring-2 ring-indigo-200 dark:border-indigo-500/50 dark:bg-indigo-500/10 dark:ring-indigo-500/20'
-                  : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700'
+                  ? 'border-slate-200 border-l-indigo-500 bg-indigo-50/80 ring-2 ring-indigo-200 dark:border-slate-800 dark:border-l-indigo-400 dark:bg-indigo-500/10 dark:ring-indigo-500/20'
+                  : 'border-slate-200 border-l-indigo-200 hover:border-l-indigo-300 dark:border-slate-800 dark:border-l-indigo-500/30 dark:hover:border-l-indigo-500/50'
               }`}
             >
               <div className="mb-1.5 flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-100 font-mono text-[11px] text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-50 font-mono text-[11px] font-medium text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-300">
                   {citation.ref_id}
                 </span>
                 <FileText size={13} className="shrink-0 text-slate-400 dark:text-slate-500" />

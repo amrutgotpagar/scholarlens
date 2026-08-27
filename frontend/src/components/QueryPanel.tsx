@@ -70,49 +70,22 @@ export function QueryPanel({ selectedDocumentId, selectedDocumentLabel, hasDocum
   }
 
   const isEmpty = status === 'idle' && !answer && !errorMessage
+  const canSend = status !== 'streaming' && !!question.trim()
 
   return (
-    <div className="mx-auto flex h-full max-w-3xl flex-col p-6">
-      <div className="mb-3 flex items-center gap-1.5 text-xs font-medium text-slate-400 dark:text-slate-500">
+    <div className="mx-auto flex h-full max-w-3xl flex-col">
+      <div className="flex items-center gap-1.5 px-6 pt-6 text-xs font-medium text-slate-400 dark:text-slate-500">
         <span>Asking across</span>
-        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+        <span className="rounded-full bg-slate-100/80 px-2 py-0.5 text-slate-600 dark:bg-slate-800/80 dark:text-slate-300">
           {selectedDocumentLabel}
         </span>
       </div>
 
-      <div className="flex gap-2">
-        <textarea
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault()
-              void runQuery(question)
-            }
-          }}
-          placeholder="Ask a question about the paper(s)…"
-          rows={3}
-          className="flex-1 resize-none rounded-xl border border-slate-200 bg-white p-3.5 text-[15px] text-slate-800 placeholder:text-slate-400 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-500/10"
-        />
-        <button
-          type="button"
-          onClick={() => void runQuery(question)}
-          disabled={status === 'streaming' || !question.trim()}
-          className="flex h-fit shrink-0 items-center gap-1.5 self-end rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-indigo-600"
-        >
-          {status === 'streaming' ? 'Asking' : 'Ask'}
-          <ArrowUp size={15} />
-        </button>
-      </div>
-      <p className="mt-1.5 text-[11px] text-slate-400 dark:text-slate-600">
-        Enter to ask · Shift+Enter for a new line
-      </p>
-
-      <div className="mt-4 flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto px-6 py-5">
         {isEmpty && (
           <div className="flex h-full flex-col items-center justify-center gap-5 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-500 dark:bg-indigo-500/10 dark:text-indigo-400">
-              <MessageCircleQuestion size={22} />
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-50 to-violet-50 text-indigo-500 ring-1 ring-indigo-100 dark:from-indigo-500/10 dark:to-violet-500/10 dark:text-indigo-400 dark:ring-indigo-500/20">
+              <MessageCircleQuestion size={24} />
             </div>
             <p className="max-w-xs text-sm text-slate-400 dark:text-slate-500">
               Answers stream in below as they're generated, with citations back to the exact page.
@@ -124,7 +97,7 @@ export function QueryPanel({ selectedDocumentId, selectedDocumentLabel, hasDocum
                     key={prompt}
                     type="button"
                     onClick={() => void runQuery(prompt)}
-                    className="rounded-full border border-slate-200 px-3.5 py-1.5 text-[13px] text-slate-600 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-slate-700 dark:text-slate-300 dark:hover:border-indigo-500/50 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-300"
+                    className="rounded-full border border-slate-200 bg-white/60 px-3.5 py-1.5 text-[13px] text-slate-600 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 hover:shadow-md dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:border-indigo-500/50 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-300"
                   >
                     {prompt}
                   </button>
@@ -156,6 +129,36 @@ export function QueryPanel({ selectedDocumentId, selectedDocumentLabel, hasDocum
         )}
 
         <SourcesPanel citations={citations} highlightedRefId={highlightedRefId} />
+      </div>
+
+      <div className="border-t border-slate-200/70 bg-white/70 px-6 py-4 backdrop-blur-md dark:border-slate-800/70 dark:bg-slate-950/70">
+        <div className="relative">
+          <textarea
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                void runQuery(question)
+              }
+            }}
+            placeholder="Ask a question about the paper(s)…"
+            rows={3}
+            className="w-full resize-none rounded-2xl border border-slate-200 bg-white p-3.5 pr-14 text-[15px] text-slate-800 shadow-sm placeholder:text-slate-400 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-500/10"
+          />
+          <button
+            type="button"
+            onClick={() => void runQuery(question)}
+            disabled={!canSend}
+            aria-label={status === 'streaming' ? 'Asking' : 'Ask'}
+            className="absolute right-2.5 bottom-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/30 transition-all duration-150 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/40 active:scale-95 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-300 disabled:shadow-none dark:disabled:from-slate-700 dark:disabled:to-slate-700"
+          >
+            <ArrowUp size={17} />
+          </button>
+        </div>
+        <p className="mt-2 text-[11px] text-slate-400 dark:text-slate-600">
+          Enter to ask · Shift+Enter for a new line
+        </p>
       </div>
     </div>
   )

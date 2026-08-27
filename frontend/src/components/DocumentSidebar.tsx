@@ -51,14 +51,16 @@ export function DocumentSidebar({
 
   return (
     <aside className="flex h-full w-80 shrink-0 flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
-      <div className="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
-        <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-white">
-            <Sparkles size={15} />
+      <div className="border-b border-slate-200 px-5 py-5 dark:border-slate-800">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-500/30">
+            <Sparkles size={16} />
           </div>
-          <h1 className="text-[15px] font-semibold text-slate-900 dark:text-white">arXiv RAG Q&A</h1>
+          <h1 className="text-[15px] font-semibold tracking-tight text-slate-900 dark:text-white">
+            arXiv RAG Q&A
+          </h1>
         </div>
-        <p className="mt-2 text-[13px] leading-snug text-slate-500 dark:text-slate-400">
+        <p className="mt-2.5 text-[13px] leading-snug text-slate-500 dark:text-slate-400">
           Upload papers, then ask grounded questions with citations back to the source.
         </p>
       </div>
@@ -78,17 +80,25 @@ export function DocumentSidebar({
             handleFile(e.dataTransfer.files[0])
           }}
           disabled={uploading}
-          className={`flex w-full flex-col items-center gap-2 rounded-xl border-2 border-dashed px-4 py-5 text-center transition-colors ${
+          className={`flex w-full flex-col items-center gap-2.5 rounded-2xl border-2 border-dashed px-4 py-6 text-center transition-all duration-200 ${
             dragOver
-              ? 'border-indigo-400 bg-indigo-50 dark:border-indigo-500 dark:bg-indigo-500/10'
-              : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:hover:border-slate-600 dark:hover:bg-slate-900'
+              ? 'border-indigo-400 bg-indigo-50/80 dark:border-indigo-500 dark:bg-indigo-500/10'
+              : 'border-slate-200 hover:border-indigo-200 hover:bg-slate-50/80 dark:border-slate-700 dark:hover:border-indigo-500/30 dark:hover:bg-slate-900'
           } ${uploading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
         >
-          {uploading ? (
-            <Loader2 size={20} className="animate-spin text-indigo-500" />
-          ) : (
-            <UploadCloud size={20} className="text-slate-400 dark:text-slate-500" />
-          )}
+          <div
+            className={`flex h-9 w-9 items-center justify-center rounded-full transition-colors ${
+              dragOver
+                ? 'bg-indigo-100 dark:bg-indigo-500/20'
+                : 'bg-slate-100 dark:bg-slate-800'
+            }`}
+          >
+            {uploading ? (
+              <Loader2 size={17} className="animate-spin text-indigo-500" />
+            ) : (
+              <UploadCloud size={17} className="text-slate-400 dark:text-slate-500" />
+            )}
+          </div>
           <span className="text-[13px] font-medium text-slate-600 dark:text-slate-300">
             {uploading ? 'Uploading…' : 'Drop a PDF or click to upload'}
           </span>
@@ -112,10 +122,10 @@ export function DocumentSidebar({
         <button
           type="button"
           onClick={() => onSelectDocument(null)}
-          className={`mb-1 w-full rounded-lg px-3 py-2 text-left text-[13px] font-medium transition-colors ${
+          className={`mb-1 w-full rounded-lg border-l-2 px-3 py-2 text-left text-[13px] font-medium transition-all duration-150 ${
             selectedDocumentId === null
-              ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300'
-              : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-900'
+              ? 'border-indigo-500 bg-indigo-50/70 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300'
+              : 'border-transparent text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-900'
           }`}
         >
           All documents
@@ -130,8 +140,10 @@ export function DocumentSidebar({
               key={doc.id}
               type="button"
               onClick={() => onSelectDocument(doc.id)}
-              className={`group mb-1 w-full rounded-lg px-3 py-2.5 text-left transition-colors ${
-                isSelected ? 'bg-indigo-50 dark:bg-indigo-500/15' : 'hover:bg-slate-50 dark:hover:bg-slate-900'
+              className={`group mb-1 w-full rounded-lg border-l-2 px-3 py-2.5 text-left transition-all duration-150 ${
+                isSelected
+                  ? 'border-indigo-500 bg-indigo-50/70 dark:bg-indigo-500/10'
+                  : 'border-transparent hover:bg-slate-50 dark:hover:bg-slate-900'
               }`}
             >
               <div className="flex items-start gap-2">
