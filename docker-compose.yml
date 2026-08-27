@@ -16,6 +16,21 @@ services:
       timeout: 5s
       retries: 10
 
+  # Free, local alternative to the OpenAI API (set LLM_PROVIDER=ollama in .env to use it).
+  # Always started so `docker-compose up` "just works" either way; costs nothing if unused.
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
   backend:
     build: ./backend
     restart: unless-stopped
@@ -28,6 +43,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      ollama:
+        condition: service_healthy
 
 volumes:
   pgdata:
+  ollama_models:

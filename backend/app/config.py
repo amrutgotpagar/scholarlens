@@ -8,10 +8,20 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+psycopg://rag:rag@localhost:5432/rag"
 
+    # "openai" (default, matches the spec'd stack) or "ollama" (free local inference for dev/demo
+    # when there's no OpenAI budget). Both implement the same EmbeddingProvider/GenerationProvider
+    # interface, so nothing outside app/llm/ and app/dependencies.py needs to know which is active.
+    llm_provider: str = "openai"
+
     openai_api_key: str = ""
     embedding_model: str = "text-embedding-3-small"
     embedding_dim: int = 1536
     generation_model: str = "gpt-4o-mini"
+
+    ollama_base_url: str = "http://ollama:11434/v1"
+    ollama_embedding_model: str = "nomic-embed-text"
+    ollama_embedding_dim: int = 768
+    ollama_generation_model: str = "llama3.2:1b"
 
     chunk_size: int = 800
     chunk_overlap: int = 150
@@ -24,6 +34,14 @@ class Settings(BaseSettings):
     allowed_upload_content_types: tuple[str, ...] = ("application/pdf",)
 
     cors_allow_origins: tuple[str, ...] = ("http://localhost:5173",)
+
+    @property
+    def active_embedding_dim(self) -> int:
+        """The pgvector column width to use, based on whichever provider is active.
+        Read by both the ORM model and the initial migration so the schema always
+        matches LLM_PROVIDER. Changing LLM_PROVIDER after the schema is created
+        requires a new migration to alter the column width."""
+        return self.embedding_dim if self.llm_provider == "openai" else self.ollama_embedding_dim
 
 
 @lru_cache

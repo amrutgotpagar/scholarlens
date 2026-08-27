@@ -38,7 +38,12 @@ class Document(Base):
     byte_size: Mapped[int] = mapped_column(Integer)
     page_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     status: Mapped[DocumentStatus] = mapped_column(
-        Enum(DocumentStatus, name="document_status"), default=DocumentStatus.PENDING
+        Enum(
+            DocumentStatus,
+            name="document_status",
+            values_callable=lambda enum_cls: [member.value for member in enum_cls],
+        ),
+        default=DocumentStatus.PENDING,
     )
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=_now)
@@ -56,6 +61,6 @@ class Chunk(Base):
     page_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
     text: Mapped[str] = mapped_column(Text)
     token_count: Mapped[int] = mapped_column(Integer)
-    embedding: Mapped[list[float]] = mapped_column(Vector(settings.embedding_dim))
+    embedding: Mapped[list[float]] = mapped_column(Vector(settings.active_embedding_dim))
 
     document: Mapped["Document"] = relationship(back_populates="chunks")

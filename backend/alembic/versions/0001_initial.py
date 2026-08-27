@@ -11,19 +11,27 @@ from alembic import op
 from pgvector.sqlalchemy import Vector
 from sqlalchemy.dialects import postgresql
 
+from app.config import get_settings
+
 revision: str = "0001"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-EMBEDDING_DIM = 1536
+# Column width follows whichever LLM_PROVIDER is active at migration time (see
+# Settings.active_embedding_dim). Switching providers after this migration has
+# run against a real database requires a follow-up migration to ALTER the column.
+EMBEDDING_DIM = get_settings().active_embedding_dim
 
 
 def upgrade() -> None:
     op.execute("CREATE EXTENSION IF NOT EXISTS vector")
 
+    # create_type=False: the column below creates the enum type itself via
+    # create_table's own DDL. Pre-creating it here too causes a DuplicateObject
+    # error because op.create_table's enum-creation path does not check first.
     document_status = postgresql.ENUM(
-        "pending", "processing", "ready", "failed", name="document_status"
+        "pending", "processing", "ready", "failed", name="document_status", create_type=False
     )
     document_status.create(op.get_bind(), checkfirst=True)
 
