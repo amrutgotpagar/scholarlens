@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime, timezone
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import Enum, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import Enum, ForeignKey, Integer, LargeBinary, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -52,6 +52,10 @@ class Document(Base):
     )
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=_now)
+    # deferred=True: the raw PDF bytes (up to max_upload_bytes) must never load along with
+    # ordinary metadata queries (list/get) — only the dedicated file-serving endpoint below
+    # touches this column.
+    file_data: Mapped[bytes | None] = mapped_column(LargeBinary, deferred=True, nullable=True)
 
     chunks: Mapped[list["Chunk"]] = relationship(back_populates="document", cascade="all, delete-orphan")
 

@@ -10,7 +10,7 @@ export function TopBar({ documents }: Props) {
   const totalPages = documents.reduce((sum, d) => sum + (d.page_count ?? 0), 0)
 
   return (
-    <header className="flex shrink-0 items-center justify-between border-b border-slate-200/70 px-5 py-3 dark:border-slate-800/70">
+    <header className="relative z-10 flex shrink-0 items-center justify-between px-5 py-3 shadow-[0_1px_0_rgba(15,23,42,0.06)] dark:shadow-[0_1px_0_rgba(255,255,255,0.05)]">
       <div className="flex items-center gap-2.5">
         <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/30">
           <Sparkles size={16} />

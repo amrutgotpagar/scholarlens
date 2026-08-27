@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { listDocuments, uploadDocument } from './api'
 import { DocumentSidebar } from './components/DocumentSidebar'
+import { PdfPreviewModal } from './components/PdfPreviewModal'
 import { QueryPanel } from './components/QueryPanel'
 import { TopBar } from './components/TopBar'
 import type { DocumentOut } from './types'
@@ -10,6 +11,7 @@ function App() {
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [previewDocument, setPreviewDocument] = useState<DocumentOut | null>(null)
 
   const refreshDocuments = async () => {
     try {
@@ -50,6 +52,7 @@ function App() {
           onUpload={handleUpload}
           uploading={uploading}
           uploadError={uploadError}
+          onPreview={setPreviewDocument}
         />
         <main className="premium-bg flex-1 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xl shadow-slate-900/5 dark:border-slate-800/80 dark:bg-slate-900 dark:shadow-black/30">
           <QueryPanel
@@ -59,6 +62,7 @@ function App() {
           />
         </main>
       </div>
+      <PdfPreviewModal document={previewDocument} onClose={() => setPreviewDocument(null)} />
     </div>
   )
 }

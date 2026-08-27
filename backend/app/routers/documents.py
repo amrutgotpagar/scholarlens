@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -35,6 +36,7 @@ def upload_document(
         content_type=file.content_type,
         byte_size=len(body),
         status=DocumentStatus.PROCESSING,
+        file_data=body,  # stored up front so the preview endpoint works even if processing later fails
     )
     db.add(document)
     db.commit()
@@ -97,3 +99,17 @@ def get_document(document_id: str, db: Session = Depends(get_db)) -> Document:
     if document is None:
         raise HTTPException(status_code=404, detail="Document not found")
     return document
+
+
+@router.get("/{document_id}/file")
+def get_document_file(document_id: str, db: Session = Depends(get_db)) -> Response:
+    document = db.get(Document, document_id)
+    if document is None or document.file_data is None:
+        raise HTTPException(status_code=404, detail="File not found")
+    return Response(
+        content=document.file_data,
+        media_type="application/pdf",
+        # inline (not attachment): the browser renders it in place for the preview UI
+        # rather than force-downloading it.
+        headers={"Content-Disposition": f'inline; filename="{document.filename}"'},
+    )

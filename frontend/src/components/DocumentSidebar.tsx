@@ -1,4 +1,4 @@
-import { AlertCircle, CheckCircle2, Clock, FileText, Lightbulb, Loader2, UploadCloud } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Clock, Eye, FileText, Lightbulb, Loader2, UploadCloud } from 'lucide-react'
 import { useRef, useState } from 'react'
 import type { DocumentOut } from '../types'
 
@@ -32,6 +32,7 @@ interface Props {
   onUpload: (file: File) => Promise<void>
   uploading: boolean
   uploadError: string | null
+  onPreview: (document: DocumentOut) => void
 }
 
 export function DocumentSidebar({
@@ -41,6 +42,7 @@ export function DocumentSidebar({
   onUpload,
   uploading,
   uploadError,
+  onPreview,
 }: Props) {
   const [dragOver, setDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -123,44 +125,58 @@ export function DocumentSidebar({
           const StatusIcon = status.icon
           const isSelected = selectedDocumentId === doc.id
           return (
-            <button
+            <div
               key={doc.id}
-              type="button"
-              onClick={() => onSelectDocument(doc.id)}
-              className={`group mb-1 w-full rounded-lg border-l-2 px-3 py-2.5 text-left transition-all duration-150 ${
+              className={`group relative mb-1 rounded-lg border-l-2 transition-all duration-150 ${
                 isSelected
                   ? 'border-indigo-500 bg-indigo-50/70 dark:bg-indigo-500/10'
                   : 'border-transparent hover:bg-slate-50 dark:hover:bg-slate-900'
               }`}
             >
-              <div className="flex items-start gap-2">
-                <FileText
-                  size={15}
-                  className={`mt-0.5 shrink-0 ${isSelected ? 'text-indigo-500' : 'text-slate-400 dark:text-slate-500'}`}
-                />
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-[13px] font-medium text-slate-800 dark:text-slate-200">
-                    {doc.title ?? doc.filename}
-                  </div>
-                  <div className="mt-1.5 flex items-center gap-1.5">
-                    <span
-                      className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[11px] font-medium ${status.className}`}
-                    >
-                      <StatusIcon size={10} className={doc.status === 'processing' ? 'animate-spin' : ''} />
-                      {status.label}
-                    </span>
-                    {doc.page_count !== null && (
-                      <span className="text-[11px] text-slate-400 dark:text-slate-500">
-                        {doc.page_count} {doc.page_count === 1 ? 'page' : 'pages'}
+              <button
+                type="button"
+                onClick={() => onSelectDocument(doc.id)}
+                className={`w-full px-3 py-2.5 text-left ${doc.status === 'ready' ? 'pr-9' : ''}`}
+              >
+                <div className="flex items-start gap-2">
+                  <FileText
+                    size={15}
+                    className={`mt-0.5 shrink-0 ${isSelected ? 'text-indigo-500' : 'text-slate-400 dark:text-slate-500'}`}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[13px] font-medium text-slate-800 dark:text-slate-200">
+                      {doc.title ?? doc.filename}
+                    </div>
+                    <div className="mt-1.5 flex items-center gap-1.5">
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[11px] font-medium ${status.className}`}
+                      >
+                        <StatusIcon size={10} className={doc.status === 'processing' ? 'animate-spin' : ''} />
+                        {status.label}
                       </span>
+                      {doc.page_count !== null && (
+                        <span className="text-[11px] text-slate-400 dark:text-slate-500">
+                          {doc.page_count} {doc.page_count === 1 ? 'page' : 'pages'}
+                        </span>
+                      )}
+                    </div>
+                    {doc.status === 'failed' && doc.error_message && (
+                      <div className="mt-1 text-[11px] text-red-600 dark:text-red-400">{doc.error_message}</div>
                     )}
                   </div>
-                  {doc.status === 'failed' && doc.error_message && (
-                    <div className="mt-1 text-[11px] text-red-600 dark:text-red-400">{doc.error_message}</div>
-                  )}
                 </div>
-              </div>
-            </button>
+              </button>
+              {doc.status === 'ready' && (
+                <button
+                  type="button"
+                  onClick={() => onPreview(doc)}
+                  aria-label="Preview PDF"
+                  className="absolute top-1/2 right-2 -translate-y-1/2 rounded-md p-1.5 text-slate-400 opacity-0 transition-opacity hover:bg-slate-200/70 hover:text-slate-600 group-hover:opacity-100 dark:text-slate-500 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+                >
+                  <Eye size={14} />
+                </button>
+              )}
+            </div>
           )
         })}
 
