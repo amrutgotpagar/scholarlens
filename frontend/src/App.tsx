@@ -48,8 +48,12 @@ function App() {
         uploading={uploading}
         uploadError={uploadError}
       />
-      <main className="flex-1 overflow-hidden">
-        <QueryPanel selectedDocumentId={selectedDocumentId} selectedDocumentLabel={selectedDocumentLabel} />
+      <main className="flex-1 overflow-hidden bg-slate-50 dark:bg-slate-950">
+        <QueryPanel
+          selectedDocumentId={selectedDocumentId}
+          selectedDocumentLabel={selectedDocumentLabel}
+          hasDocuments={documents.some((d) => d.status === 'ready')}
+        />
       </main>
     </div>
   )

@@ -1,6 +1,7 @@
-import type { ReactNode } from 'react'
+import ReactMarkdown, { defaultUrlTransform } from 'react-markdown'
 
 const CITATION_PATTERN = /\[(\d+(?:\s*,\s*\d+)*)\]/g
+const CITE_HREF_PREFIX = 'cite:'
 
 interface Props {
   text: string
@@ -8,44 +9,50 @@ interface Props {
   onCitationClick: (refId: number) => void
 }
 
-/** Renders answer text, turning "[1]" / "[1, 3]" markers into clickable badges that jump to
- * the matching source card. Markers referencing an unknown ref id render as plain text. */
+/** Rewrites "[1]" / "[1, 3]" markers into markdown links pointing at a synthetic
+ * "cite:1" href, so they ride through react-markdown's normal parsing instead of
+ * needing a separate text-splitting pass. Markers referencing an unknown ref id
+ * are left as plain text. */
+function linkifyCitations(text: string, validRefIds: Set<number>): string {
+  return text.replace(CITATION_PATTERN, (match, idsPart: string) => {
+    const refIds = idsPart.split(',').map((s) => Number.parseInt(s.trim(), 10))
+    if (!refIds.every((id) => validRefIds.has(id))) return match
+    return `[${match}](${CITE_HREF_PREFIX}${refIds[0]})`
+  })
+}
+
 export function AnswerText({ text, validRefIds, onCitationClick }: Props) {
-  const parts: ReactNode[] = []
-  let lastIndex = 0
-  let key = 0
-
-  // matchAll (rather than a manual exec loop) doesn't mutate CITATION_PATTERN.lastIndex,
-  // so concurrent renders can't corrupt each other's match position on the shared regex.
-  for (const match of text.matchAll(CITATION_PATTERN)) {
-    if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index))
-    }
-
-    const refIds = match[1].split(',').map((s) => Number.parseInt(s.trim(), 10))
-    const allValid = refIds.every((id) => validRefIds.has(id))
-
-    if (allValid) {
-      parts.push(
-        <button
-          key={`cite-${key++}`}
-          type="button"
-          onClick={() => onCitationClick(refIds[0])}
-          className="mx-0.5 rounded bg-indigo-100 px-1 font-mono text-xs text-indigo-700 hover:bg-indigo-200"
-        >
-          {match[0]}
-        </button>,
-      )
-    } else {
-      parts.push(match[0])
-    }
-
-    lastIndex = match.index + match[0].length
-  }
-
-  if (lastIndex < text.length) {
-    parts.push(text.slice(lastIndex))
-  }
-
-  return <p className="whitespace-pre-wrap text-slate-800">{parts}</p>
+  return (
+    <div className="prose prose-slate dark:prose-invert prose-p:leading-relaxed prose-p:my-3 first:prose-p:mt-0 max-w-none text-[15px]">
+      <ReactMarkdown
+        // react-markdown's default sanitizer blanks any URL scheme it doesn't recognize
+        // (http/https/mailto/etc.) — our synthetic "cite:1" hrefs need an explicit carve-out
+        // or they're silently stripped to "" before the `a` component below ever sees them.
+        urlTransform={(url) => (url.startsWith(CITE_HREF_PREFIX) ? url : defaultUrlTransform(url))}
+        components={{
+          a: ({ href, children }) => {
+            if (href?.startsWith(CITE_HREF_PREFIX)) {
+              const refId = Number.parseInt(href.slice(CITE_HREF_PREFIX.length), 10)
+              return (
+                <button
+                  type="button"
+                  onClick={() => onCitationClick(refId)}
+                  className="mx-0.5 rounded bg-indigo-100 px-1 py-0.5 font-mono text-xs font-medium text-indigo-700 no-underline hover:bg-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-300 dark:hover:bg-indigo-500/30"
+                >
+                  {children}
+                </button>
+              )
+            }
+            return (
+              <a href={href} target="_blank" rel="noopener noreferrer">
+                {children}
+              </a>
+            )
+          },
+        }}
+      >
+        {linkifyCitations(text, validRefIds)}
+      </ReactMarkdown>
+    </div>
+  )
 }
