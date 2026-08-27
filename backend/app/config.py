@@ -8,9 +8,10 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+psycopg://rag:rag@localhost:5432/rag"
 
-    # "openai" (default, matches the spec'd stack) or "ollama" (free local inference for dev/demo
-    # when there's no OpenAI budget). Both implement the same EmbeddingProvider/GenerationProvider
-    # interface, so nothing outside app/llm/ and app/dependencies.py needs to know which is active.
+    # "openai" (default, matches the spec'd stack), "ollama" (free local inference), or "nvidia"
+    # (NVIDIA NIM's hosted OpenAI-compatible API, free developer credits). All three implement
+    # the same EmbeddingProvider/GenerationProvider interface, so nothing outside app/llm/ and
+    # app/dependencies.py needs to know which is active.
     llm_provider: str = "openai"
 
     openai_api_key: str = ""
@@ -22,6 +23,15 @@ class Settings(BaseSettings):
     ollama_embedding_model: str = "nomic-embed-text"
     ollama_embedding_dim: int = 768
     ollama_generation_model: str = "llama3.2:1b"
+
+    nvidia_api_key: str = ""
+    nvidia_base_url: str = "https://integrate.api.nvidia.com/v1"
+    # nv-embedqa-e5-v5 (an earlier NIM embedding model) is deprecated on NVIDIA's hosted API
+    # as of this build; nemotron-3-embed-1b is the current active replacement. Verified live
+    # against the real endpoint: 2048-dim output, same input_type query/passage convention.
+    nvidia_embedding_model: str = "nvidia/nemotron-3-embed-1b"
+    nvidia_embedding_dim: int = 2048
+    nvidia_generation_model: str = "nvidia/nemotron-3-ultra-550b-a55b"
 
     chunk_size: int = 800
     chunk_overlap: int = 150
@@ -45,7 +55,11 @@ class Settings(BaseSettings):
         Read by both the ORM model and the initial migration so the schema always
         matches LLM_PROVIDER. Changing LLM_PROVIDER after the schema is created
         requires a new migration to alter the column width."""
-        return self.embedding_dim if self.llm_provider == "openai" else self.ollama_embedding_dim
+        return {
+            "openai": self.embedding_dim,
+            "ollama": self.ollama_embedding_dim,
+            "nvidia": self.nvidia_embedding_dim,
+        }[self.llm_provider]
 
 
 @lru_cache

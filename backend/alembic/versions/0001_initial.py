@@ -23,6 +23,15 @@ depends_on: Union[str, Sequence[str], None] = None
 # run against a real database requires a follow-up migration to ALTER the column.
 EMBEDDING_DIM = get_settings().active_embedding_dim
 
+# Both of pgvector's ANN index types (ivfflat, hnsw) cap out at 2000 dimensions per vector
+# (an index tuple must fit in an 8KB Postgres page) — some hosted embedding models exceed
+# that (e.g. NVIDIA's nemotron-3-embed-1b is a fixed 2048-dim, no truncation option). Above
+# the limit, skip the ANN index entirely rather than fail the migration: cosine search still
+# works correctly via a sequential scan, just without index acceleration. Fine at portfolio
+# scale; a real high-QPS deployment on a >2000-dim model would need pgvector's halfvec type
+# instead (doubles the usable dimension ceiling at half the storage per dimension).
+CAN_INDEX_EMBEDDING = EMBEDDING_DIM <= 2000
+
 
 def upgrade() -> None:
     op.execute("CREATE EXTENSION IF NOT EXISTS vector")
@@ -70,20 +79,22 @@ def upgrade() -> None:
         sa.UniqueConstraint("document_id", "chunk_index", name="uq_chunk_document_index"),
     )
 
-    op.create_index(
-        "ix_chunks_embedding_cosine",
-        "chunks",
-        ["embedding"],
-        postgresql_using="ivfflat",
-        postgresql_with={"lists": 100},
-        postgresql_ops={"embedding": "vector_cosine_ops"},
-    )
+    if CAN_INDEX_EMBEDDING:
+        op.create_index(
+            "ix_chunks_embedding_cosine",
+            "chunks",
+            ["embedding"],
+            postgresql_using="ivfflat",
+            postgresql_with={"lists": 100},
+            postgresql_ops={"embedding": "vector_cosine_ops"},
+        )
     op.create_index("ix_chunks_document_id", "chunks", ["document_id"])
 
 
 def downgrade() -> None:
     op.drop_index("ix_chunks_document_id", table_name="chunks")
-    op.drop_index("ix_chunks_embedding_cosine", table_name="chunks")
+    if CAN_INDEX_EMBEDDING:
+        op.drop_index("ix_chunks_embedding_cosine", table_name="chunks")
     op.drop_table("chunks")
     op.drop_table("documents")
     postgresql.ENUM(name="document_status").drop(op.get_bind(), checkfirst=True)
