@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from 'framer-motion'
 import { AlertCircle, ArrowUp, MessageCircleQuestion } from 'lucide-react'
 import { useState } from 'react'
 import { streamQuery } from '../api'
@@ -10,6 +11,15 @@ const EXAMPLE_PROMPTS = [
   'What method or architecture does it propose?',
   'What datasets or benchmarks were used to evaluate it?',
 ]
+
+const promptListVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.06 } },
+}
+const promptItemVariants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0 },
+}
 
 interface Props {
   selectedDocumentId: string | null
@@ -26,6 +36,7 @@ export function QueryPanel({ selectedDocumentId, selectedDocumentLabel, hasDocum
   const [status, setStatus] = useState<Status>('idle')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [highlightedRefId, setHighlightedRefId] = useState<number | null>(null)
+  const [isFocused, setIsFocused] = useState(false)
 
   const validRefIds = new Set(citations.map((c) => c.ref_id))
 
@@ -84,58 +95,97 @@ export function QueryPanel({ selectedDocumentId, selectedDocumentLabel, hasDocum
       <div className="flex-1 overflow-y-auto px-6 py-5">
         {isEmpty && (
           <div className="flex h-full flex-col items-center justify-center gap-5 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-50 to-violet-50 text-indigo-500 ring-1 ring-indigo-100 dark:from-indigo-500/10 dark:to-violet-500/10 dark:text-indigo-400 dark:ring-indigo-500/20">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+              className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-50 to-violet-50 text-indigo-500 ring-1 ring-indigo-100 dark:from-indigo-500/10 dark:to-violet-500/10 dark:text-indigo-400 dark:ring-indigo-500/20"
+            >
               <MessageCircleQuestion size={24} />
-            </div>
+            </motion.div>
             <p className="max-w-xs text-sm text-slate-400 dark:text-slate-500">
               Answers stream in below as they're generated, with citations back to the exact page.
             </p>
             {hasDocuments && (
-              <div className="flex flex-col gap-2">
+              <motion.div
+                variants={promptListVariants}
+                initial="hidden"
+                animate="visible"
+                className="flex flex-col gap-2"
+              >
                 {EXAMPLE_PROMPTS.map((prompt) => (
-                  <button
+                  <motion.button
                     key={prompt}
+                    variants={promptItemVariants}
                     type="button"
                     onClick={() => void runQuery(prompt)}
-                    className="rounded-full border border-slate-200 bg-white/60 px-3.5 py-1.5 text-[13px] text-slate-600 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 hover:shadow-md dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:border-indigo-500/50 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-300"
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="rounded-full border border-slate-200 bg-white/60 px-3.5 py-1.5 text-[13px] text-slate-600 shadow-sm transition-colors duration-150 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 hover:shadow-md dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:border-indigo-500/50 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-300"
                   >
                     {prompt}
-                  </button>
+                  </motion.button>
                 ))}
-              </div>
+              </motion.div>
             )}
           </div>
         )}
 
         {errorMessage && (
-          <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400"
+          >
             <AlertCircle size={16} className="mt-0.5 shrink-0" />
             {errorMessage}
-          </div>
+          </motion.div>
         )}
 
-        {!errorMessage && status === 'streaming' && !answer && (
-          <div className="flex items-center gap-1.5 py-1 text-slate-400 dark:text-slate-500">
-            <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-current [animation-delay:0ms]" />
-            <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-current [animation-delay:150ms]" />
-            <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-current [animation-delay:300ms]" />
-          </div>
-        )}
+        <AnimatePresence>
+          {!errorMessage && status === 'streaming' && !answer && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex items-center gap-1.5 py-1 text-slate-400 dark:text-slate-500"
+            >
+              {[0, 1, 2].map((i) => (
+                <motion.span
+                  key={i}
+                  className="h-1.5 w-1.5 rounded-full bg-current"
+                  animate={{ y: [0, -4, 0], opacity: [0.4, 1, 0.4] }}
+                  transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.15, ease: 'easeInOut' }}
+                />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {!errorMessage && answer && (
-          <div className="animate-fade-in">
+          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
             <AnswerText text={answer} validRefIds={validRefIds} onCitationClick={handleCitationClick} />
-          </div>
+          </motion.div>
         )}
 
         <SourcesPanel citations={citations} highlightedRefId={highlightedRefId} />
       </div>
 
       <div className="border-t border-slate-200/70 bg-white/70 px-6 py-4 backdrop-blur-md dark:border-slate-800/70 dark:bg-slate-950/70">
-        <div className="relative">
+        <motion.div
+          className="relative rounded-2xl"
+          animate={{
+            boxShadow: isFocused
+              ? '0 0 0 4px rgba(99,102,241,0.14), 0 4px 20px rgba(99,102,241,0.12)'
+              : '0 0 0 0px rgba(99,102,241,0)',
+          }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+        >
           <textarea
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault()
@@ -144,18 +194,22 @@ export function QueryPanel({ selectedDocumentId, selectedDocumentLabel, hasDocum
             }}
             placeholder="Ask a question about the paper(s)…"
             rows={3}
-            className="w-full resize-none rounded-2xl border border-slate-200 bg-white p-3.5 pr-14 text-[15px] text-slate-800 shadow-sm placeholder:text-slate-400 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-500/10"
+            className="w-full resize-none rounded-2xl border border-slate-200 bg-white p-3.5 pr-14 text-[15px] text-slate-800 placeholder:text-slate-400 focus:border-indigo-400 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-500"
           />
-          <button
+          <motion.button
             type="button"
             onClick={() => void runQuery(question)}
             disabled={!canSend}
             aria-label={status === 'streaming' ? 'Asking' : 'Ask'}
-            className="absolute right-2.5 bottom-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/30 transition-all duration-150 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/40 active:scale-95 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-300 disabled:shadow-none dark:disabled:from-slate-700 dark:disabled:to-slate-700"
+            whileHover={canSend ? { scale: 1.08 } : undefined}
+            whileTap={canSend ? { scale: 0.92 } : undefined}
+            animate={status === 'streaming' ? { opacity: [1, 0.5, 1] } : { opacity: 1 }}
+            transition={status === 'streaming' ? { duration: 1.1, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.15 }}
+            className="absolute right-2.5 bottom-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/30 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-300 disabled:shadow-none dark:disabled:from-slate-700 dark:disabled:to-slate-700"
           >
             <ArrowUp size={17} />
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
         <p className="mt-2 text-[11px] text-slate-400 dark:text-slate-600">
           Enter to ask · Shift+Enter for a new line
         </p>

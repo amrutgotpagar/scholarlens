@@ -1,9 +1,19 @@
+import { motion } from 'framer-motion'
 import { FileText } from 'lucide-react'
 import type { Citation } from '../types'
 
 interface Props {
   citations: Citation[]
   highlightedRefId: number | null
+}
+
+const listVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.05 } },
+}
+const itemVariants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0 },
 }
 
 export function SourcesPanel({ citations, highlightedRefId }: Props) {
@@ -14,12 +24,13 @@ export function SourcesPanel({ citations, highlightedRefId }: Props) {
       <h3 className="mb-3 text-xs font-semibold tracking-wide text-slate-400 uppercase dark:text-slate-500">
         Sources
       </h3>
-      <div className="space-y-2.5">
+      <motion.div variants={listVariants} initial="hidden" animate="visible" className="space-y-2.5">
         {citations.map((citation) => {
           const isHighlighted = highlightedRefId === citation.ref_id
           return (
-            <div
+            <motion.div
               key={citation.ref_id}
+              variants={itemVariants}
               id={`source-${citation.ref_id}`}
               className={`scroll-mt-4 rounded-xl border border-l-[3px] bg-white p-3.5 text-sm shadow-sm transition-all duration-300 dark:bg-slate-900 ${
                 isHighlighted
@@ -40,10 +51,10 @@ export function SourcesPanel({ citations, highlightedRefId }: Props) {
                 )}
               </div>
               <p className="leading-relaxed text-slate-600 dark:text-slate-300">{citation.text}</p>
-            </div>
+            </motion.div>
           )
         })}
-      </div>
+      </motion.div>
     </div>
   )
 }
