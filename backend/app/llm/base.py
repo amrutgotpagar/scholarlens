@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections.abc import Iterator
 
 
 class EmbeddingProvider(ABC):
@@ -19,3 +20,7 @@ class GenerationProvider(ABC):
     @abstractmethod
     def generate(self, system_prompt: str, user_prompt: str) -> str:
         """Return the full generated answer for a prompt."""
+
+    @abstractmethod
+    def stream_generate(self, system_prompt: str, user_prompt: str) -> Iterator[str]:
+        """Yield the answer incrementally, one text delta at a time."""

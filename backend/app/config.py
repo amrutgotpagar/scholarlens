@@ -35,6 +35,10 @@ class Settings(BaseSettings):
 
     cors_allow_origins: tuple[str, ...] = ("http://localhost:5173",)
 
+    # Per-client-IP, in-memory (see app/middleware.py for why IP rather than user).
+    rate_limit_requests: int = 30
+    rate_limit_window_seconds: float = 60.0
+
     @property
     def active_embedding_dim(self) -> int:
         """The pgvector column width to use, based on whichever provider is active.
