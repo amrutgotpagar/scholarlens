@@ -1,4 +1,4 @@
-import type { Citation, DocumentOut } from './types'
+import type { Citation, DocumentOut, FeedbackRating } from './types'
 
 const API_BASE = '/api'
 
@@ -23,6 +23,20 @@ export async function uploadDocument(file: File): Promise<DocumentOut> {
   const res = await fetch(`${API_BASE}/documents`, { method: 'POST', body: formData })
   if (!res.ok) throw new Error(await parseErrorDetail(res))
   return res.json()
+}
+
+export async function submitFeedback(
+  question: string,
+  answer: string,
+  rating: FeedbackRating,
+  documentId: string | null,
+): Promise<void> {
+  const res = await fetch(`${API_BASE}/feedback`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question, answer, rating, document_id: documentId }),
+  })
+  if (!res.ok) throw new Error(await parseErrorDetail(res))
 }
 
 export type QueryStreamEvent =

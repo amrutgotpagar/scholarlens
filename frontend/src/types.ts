@@ -17,3 +17,5 @@ export interface Citation {
   page_number: number | null
   text: string
 }
+
+export type FeedbackRating = 'up' | 'down'

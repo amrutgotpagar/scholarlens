@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from app.db.models import DocumentStatus
+from app.db.models import DocumentStatus, FeedbackRating
 
 
 class DocumentOut(BaseModel):
@@ -35,3 +35,18 @@ class CitationOut(BaseModel):
 class QueryResponse(BaseModel):
     answer: str
     citations: list[CitationOut]
+
+
+class FeedbackCreate(BaseModel):
+    question: str = Field(min_length=1, max_length=2000)
+    answer: str = Field(min_length=1, max_length=20000)
+    rating: FeedbackRating
+    document_id: uuid.UUID | None = None
+
+
+class FeedbackOut(BaseModel):
+    id: uuid.UUID
+    rating: FeedbackRating
+    created_at: datetime
+
+    model_config = {"from_attributes": True}

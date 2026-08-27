@@ -5,7 +5,7 @@ from app.config import get_settings
 from app.exception_handlers import register_exception_handlers
 from app.logging_config import configure_logging
 from app.middleware import RateLimitMiddleware, RequestContextMiddleware
-from app.routers import documents, query
+from app.routers import documents, feedback, query
 
 configure_logging()
 
@@ -32,6 +32,7 @@ app.add_middleware(
 
 app.include_router(documents.router)
 app.include_router(query.router)
+app.include_router(feedback.router)
 
 
 @app.get("/health")

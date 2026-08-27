@@ -1,12 +1,15 @@
+import { FileText } from 'lucide-react'
 import ReactMarkdown, { defaultUrlTransform } from 'react-markdown'
+import type { Citation } from '../types'
 
 const CITATION_PATTERN = /\[(\d+(?:\s*,\s*\d+)*)\]/g
 const CITE_HREF_PREFIX = 'cite:'
 
 interface Props {
   text: string
-  validRefIds: Set<number>
+  citations: Citation[]
   onCitationClick: (refId: number) => void
+  isStreaming?: boolean
 }
 
 /** Rewrites "[1]" / "[1, 3]" markers into markdown links pointing at a synthetic
@@ -21,7 +24,14 @@ function linkifyCitations(text: string, validRefIds: Set<number>): string {
   })
 }
 
-export function AnswerText({ text, validRefIds, onCitationClick }: Props) {
+function shortTitle(title: string): string {
+  return title.length > 22 ? `${title.slice(0, 21)}…` : title
+}
+
+export function AnswerText({ text, citations, onCitationClick, isStreaming }: Props) {
+  const citationsByRefId = new Map(citations.map((c) => [c.ref_id, c]))
+  const validRefIds = new Set(citations.map((c) => c.ref_id))
+
   return (
     <div className="prose prose-slate dark:prose-invert prose-p:leading-relaxed prose-p:my-3 first:prose-p:mt-0 prose-strong:font-semibold prose-strong:text-slate-900 dark:prose-strong:text-white max-w-none font-serif text-[16.5px]">
       <ReactMarkdown
@@ -33,13 +43,17 @@ export function AnswerText({ text, validRefIds, onCitationClick }: Props) {
           a: ({ href, children }) => {
             if (href?.startsWith(CITE_HREF_PREFIX)) {
               const refId = Number.parseInt(href.slice(CITE_HREF_PREFIX.length), 10)
+              const citation = citationsByRefId.get(refId)
               return (
                 <button
                   type="button"
                   onClick={() => onCitationClick(refId)}
-                  className="mx-0.5 rounded-md bg-indigo-100 px-1.5 py-0.5 font-mono text-xs font-medium text-indigo-700 no-underline transition-colors hover:bg-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-300 dark:hover:bg-indigo-500/30"
+                  className="mx-0.5 inline-flex translate-y-[3px] items-center gap-1 rounded-full border border-indigo-100 bg-indigo-50/80 px-1.5 py-0.5 align-baseline font-sans text-[11px] font-medium text-indigo-700 no-underline transition-colors hover:border-indigo-200 hover:bg-indigo-100 dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20"
                 >
-                  {children}
+                  <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-white">
+                    <FileText size={8} />
+                  </span>
+                  {citation ? shortTitle(citation.document_title) : children}
                 </button>
               )
             }
@@ -53,6 +67,9 @@ export function AnswerText({ text, validRefIds, onCitationClick }: Props) {
       >
         {linkifyCitations(text, validRefIds)}
       </ReactMarkdown>
+      {isStreaming && (
+        <span className="animate-blink ml-0.5 inline-block h-[1.1em] w-[2px] translate-y-[3px] bg-indigo-400 dark:bg-indigo-500" />
+      )}
     </div>
   )
 }

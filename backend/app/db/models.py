@@ -28,6 +28,11 @@ class DocumentStatus(str, enum.Enum):
     FAILED = "failed"
 
 
+class FeedbackRating(str, enum.Enum):
+    UP = "up"
+    DOWN = "down"
+
+
 class Document(Base):
     __tablename__ = "documents"
 
@@ -64,3 +69,30 @@ class Chunk(Base):
     embedding: Mapped[list[float]] = mapped_column(Vector(settings.active_embedding_dim))
 
     document: Mapped["Document"] = relationship(back_populates="chunks")
+
+
+class Feedback(Base):
+    """A standalone thumbs up/down on a question+answer pair.
+
+    There's no chat-history/session persistence in this build (each /query call is
+    stateless), so feedback can't reference a stored "message" row — it captures the
+    question/answer text directly instead. document_id is nullable and ON DELETE SET NULL
+    since feedback should outlive the document it was about.
+    """
+
+    __tablename__ = "feedback"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=_uuid)
+    question: Mapped[str] = mapped_column(Text)
+    answer: Mapped[str] = mapped_column(Text)
+    rating: Mapped[FeedbackRating] = mapped_column(
+        Enum(
+            FeedbackRating,
+            name="feedback_rating",
+            values_callable=lambda enum_cls: [member.value for member in enum_cls],
+        )
+    )
+    document_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("documents.id", ondelete="SET NULL"), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(default=_now)

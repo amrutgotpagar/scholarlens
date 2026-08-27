@@ -3,7 +3,9 @@ import { AlertCircle, ArrowUp, MessageCircleQuestion } from 'lucide-react'
 import { useState } from 'react'
 import { streamQuery } from '../api'
 import type { Citation } from '../types'
+import { AnswerActions } from './AnswerActions'
 import { AnswerText } from './AnswerText'
+import { FollowUps } from './FollowUps'
 import { SourcesPanel } from './SourcesPanel'
 
 const EXAMPLE_PROMPTS = [
@@ -37,8 +39,6 @@ export function QueryPanel({ selectedDocumentId, selectedDocumentLabel, hasDocum
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [highlightedRefId, setHighlightedRefId] = useState<number | null>(null)
   const [isFocused, setIsFocused] = useState(false)
-
-  const validRefIds = new Set(citations.map((c) => c.ref_id))
 
   const runQuery = async (rawQuestion: string) => {
     const trimmed = rawQuestion.trim()
@@ -164,7 +164,18 @@ export function QueryPanel({ selectedDocumentId, selectedDocumentLabel, hasDocum
 
         {!errorMessage && answer && (
           <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-            <AnswerText text={answer} validRefIds={validRefIds} onCitationClick={handleCitationClick} />
+            <AnswerText
+              text={answer}
+              citations={citations}
+              onCitationClick={handleCitationClick}
+              isStreaming={status === 'streaming'}
+            />
+            {status === 'done' && (
+              <>
+                <AnswerActions question={question} answer={answer} documentId={selectedDocumentId} />
+                <FollowUps onSelect={(prompt) => void runQuery(prompt)} />
+              </>
+            )}
           </motion.div>
         )}
 
