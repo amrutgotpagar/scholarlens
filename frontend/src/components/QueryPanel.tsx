@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { AlertCircle, ArrowUp, MessageCircleQuestion } from 'lucide-react'
+import { AlertCircle, ArrowUp, Quote, Sparkles, UploadCloud } from 'lucide-react'
 import { useState } from 'react'
 import { streamQuery } from '../api'
 import type { Citation } from '../types'
@@ -22,6 +22,12 @@ const promptItemVariants = {
   hidden: { opacity: 0, y: 8 },
   visible: { opacity: 1, y: 0 },
 }
+
+const HOW_IT_WORKS = [
+  { icon: UploadCloud, label: 'Upload a paper' },
+  { icon: Sparkles, label: 'Ask anything' },
+  { icon: Quote, label: 'Get cited answers' },
+]
 
 interface Props {
   selectedDocumentId: string | null
@@ -94,18 +100,43 @@ export function QueryPanel({ selectedDocumentId, selectedDocumentLabel, hasDocum
 
       <div className="flex-1 overflow-y-auto px-6 py-5">
         {isEmpty && (
-          <div className="flex h-full flex-col items-center justify-center gap-5 text-center">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.35, ease: 'easeOut' }}
-              className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-50 to-violet-50 text-indigo-500 ring-1 ring-indigo-100 dark:from-indigo-500/10 dark:to-violet-500/10 dark:text-indigo-400 dark:ring-indigo-500/20"
-            >
-              <MessageCircleQuestion size={24} />
-            </motion.div>
-            <p className="max-w-xs text-sm text-slate-400 dark:text-slate-500">
-              Answers stream in below as they're generated, with citations back to the exact page.
-            </p>
+          <div className="flex h-full flex-col items-center justify-center gap-7 text-center">
+            <div className="flex flex-col items-center gap-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
+                className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/25"
+              >
+                <Sparkles size={26} />
+              </motion.div>
+              <div>
+                <h2 className="font-serif text-2xl font-semibold text-slate-800 dark:text-white">
+                  Ask your papers anything
+                </h2>
+                <p className="mx-auto mt-2 max-w-sm text-sm text-slate-400 dark:text-slate-500">
+                  Answers stream in below as they're generated, grounded in your documents and cited back to the
+                  exact page.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 sm:gap-5">
+              {HOW_IT_WORKS.map(({ icon: Icon, label }, i) => (
+                <div key={label} className="flex items-center gap-3 sm:gap-5">
+                  <div className="flex flex-col items-center gap-1.5">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                      <Icon size={15} />
+                    </div>
+                    <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500">{label}</span>
+                  </div>
+                  {i < HOW_IT_WORKS.length - 1 && (
+                    <div className="mb-4 h-px w-6 bg-gradient-to-r from-slate-200 to-slate-200/0 dark:from-slate-700" />
+                  )}
+                </div>
+              ))}
+            </div>
+
             {hasDocuments && (
               <motion.div
                 variants={promptListVariants}

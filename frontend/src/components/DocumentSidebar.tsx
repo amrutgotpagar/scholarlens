@@ -1,4 +1,4 @@
-import { AlertCircle, CheckCircle2, Clock, FileText, Loader2, Sparkles, UploadCloud } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Clock, FileText, Lightbulb, Loader2, UploadCloud } from 'lucide-react'
 import { useRef, useState } from 'react'
 import type { DocumentOut } from '../types'
 
@@ -50,21 +50,7 @@ export function DocumentSidebar({
   }
 
   return (
-    <aside className="flex h-full w-80 shrink-0 flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
-      <div className="border-b border-slate-200 px-5 py-5 dark:border-slate-800">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-500/30">
-            <Sparkles size={16} />
-          </div>
-          <h1 className="text-[15px] font-semibold tracking-tight text-slate-900 dark:text-white">
-            arXiv RAG Q&A
-          </h1>
-        </div>
-        <p className="mt-2.5 text-[13px] leading-snug text-slate-500 dark:text-slate-400">
-          Upload papers, then ask grounded questions with citations back to the source.
-        </p>
-      </div>
-
+    <aside className="flex h-full w-80 shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xl shadow-slate-900/5 dark:border-slate-800/80 dark:bg-slate-900 dark:shadow-black/30">
       <div className="p-4">
         <button
           type="button"
@@ -88,9 +74,7 @@ export function DocumentSidebar({
         >
           <div
             className={`flex h-9 w-9 items-center justify-center rounded-full transition-colors ${
-              dragOver
-                ? 'bg-indigo-100 dark:bg-indigo-500/20'
-                : 'bg-slate-100 dark:bg-slate-800'
+              dragOver ? 'bg-indigo-100 dark:bg-indigo-500/20' : 'bg-slate-100 dark:bg-slate-800'
             }`}
           >
             {uploading ? (
@@ -118,7 +102,10 @@ export function DocumentSidebar({
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 pb-4">
+      <div className="flex flex-1 flex-col overflow-y-auto px-3 pb-3">
+        <h2 className="px-3 pt-1 pb-2 text-xs font-semibold tracking-wide text-slate-400 uppercase dark:text-slate-500">
+          Library
+        </h2>
         <button
           type="button"
           onClick={() => onSelectDocument(null)}
@@ -180,6 +167,18 @@ export function DocumentSidebar({
         {documents.length === 0 && (
           <p className="px-3 py-2 text-[13px] text-slate-400 dark:text-slate-500">No documents yet.</p>
         )}
+
+        <div className="mt-auto pt-4">
+          <div className="rounded-xl border border-indigo-100 bg-indigo-50/60 p-3 dark:border-indigo-500/15 dark:bg-indigo-500/5">
+            <div className="mb-1 flex items-center gap-1.5 text-[12px] font-medium text-indigo-700 dark:text-indigo-300">
+              <Lightbulb size={13} />
+              Tip
+            </div>
+            <p className="text-[12px] leading-snug text-indigo-700/80 dark:text-indigo-300/70">
+              Ask for limitations, comparisons, or a two-sentence summary — every claim comes back cited to a page.
+            </p>
+          </div>
+        </div>
       </div>
     </aside>
   )

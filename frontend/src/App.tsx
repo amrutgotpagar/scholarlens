@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { listDocuments, uploadDocument } from './api'
 import { DocumentSidebar } from './components/DocumentSidebar'
 import { QueryPanel } from './components/QueryPanel'
+import { TopBar } from './components/TopBar'
 import type { DocumentOut } from './types'
 
 function App() {
@@ -39,22 +40,25 @@ function App() {
   const selectedDocumentLabel = selectedDocument ? selectedDocument.title ?? selectedDocument.filename : 'All documents'
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden">
-      <DocumentSidebar
-        documents={documents}
-        selectedDocumentId={selectedDocumentId}
-        onSelectDocument={setSelectedDocumentId}
-        onUpload={handleUpload}
-        uploading={uploading}
-        uploadError={uploadError}
-      />
-      <main className="premium-bg flex-1 overflow-hidden bg-slate-50 dark:bg-slate-950">
-        <QueryPanel
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-slate-100 dark:bg-black">
+      <TopBar documents={documents} />
+      <div className="flex flex-1 gap-3 overflow-hidden p-3">
+        <DocumentSidebar
+          documents={documents}
           selectedDocumentId={selectedDocumentId}
-          selectedDocumentLabel={selectedDocumentLabel}
-          hasDocuments={documents.some((d) => d.status === 'ready')}
+          onSelectDocument={setSelectedDocumentId}
+          onUpload={handleUpload}
+          uploading={uploading}
+          uploadError={uploadError}
         />
-      </main>
+        <main className="premium-bg flex-1 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xl shadow-slate-900/5 dark:border-slate-800/80 dark:bg-slate-900 dark:shadow-black/30">
+          <QueryPanel
+            selectedDocumentId={selectedDocumentId}
+            selectedDocumentLabel={selectedDocumentLabel}
+            hasDocuments={documents.some((d) => d.status === 'ready')}
+          />
+        </main>
+      </div>
     </div>
   )
 }
