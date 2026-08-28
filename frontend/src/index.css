@@ -15,6 +15,15 @@ body {
   scrollbar-width: thin;
   scrollbar-color: theme(colors.slate.300) transparent;
 }
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 @media (prefers-color-scheme: dark) {
   * {
     scrollbar-color: theme(colors.slate.700) transparent;
@@ -93,6 +102,19 @@ body {
 }
 .animate-icon-float {
   animation: icon-float 4s ease-in-out infinite;
+}
+
+@keyframes ambient-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(3%, 2%) scale(1.08);
+  }
+}
+.animate-ambient-drift {
+  animation: ambient-drift 12s ease-in-out infinite;
 }
 
 .grain-overlay {

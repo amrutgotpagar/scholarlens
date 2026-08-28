@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { LogOut } from 'lucide-react'
+import { ChevronDown, LogOut } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabaseClient'
@@ -37,15 +37,21 @@ export function AccountMenu() {
 
   return (
     <div ref={rootRef} className="relative">
-      <button
+      <motion.button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="flex items-center gap-2 rounded-full py-1 pr-1 pl-1.5 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        className={`flex items-center gap-1.5 rounded-full border py-1 pr-2 pl-1.5 transition-colors ${
+          open
+            ? 'border-indigo-200 bg-indigo-50/80 dark:border-indigo-500/30 dark:bg-indigo-500/10'
+            : 'border-slate-200/70 bg-white/60 hover:border-slate-300 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/40 dark:hover:bg-slate-800'
+        }`}
       >
         {displayName && (
-          <span className="hidden text-[13px] font-medium text-slate-600 sm:inline dark:text-slate-300">
+          <span className="hidden pl-1 text-[13px] font-medium text-slate-600 sm:inline dark:text-slate-300">
             {displayName}
           </span>
         )}
@@ -61,17 +67,20 @@ export function AccountMenu() {
             {initialFrom(displayName ?? email)}
           </span>
         )}
-      </button>
+        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.15 }}>
+          <ChevronDown size={14} className="text-slate-400 dark:text-slate-500" />
+        </motion.span>
+      </motion.button>
 
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: -6, scale: 0.97 }}
+            initial={{ opacity: 0, y: -8, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.97 }}
-            transition={{ duration: 0.15, ease: 'easeOut' }}
+            exit={{ opacity: 0, y: -8, scale: 0.96 }}
+            transition={{ type: 'spring', damping: 22, stiffness: 380 }}
             role="menu"
-            className="absolute top-full right-0 z-30 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/95 shadow-xl shadow-slate-900/10 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/95 dark:shadow-black/40"
+            className="absolute top-full right-0 z-50 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/95 shadow-2xl shadow-slate-900/15 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/95 dark:shadow-black/50"
           >
             <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3.5 dark:border-slate-800">
               {avatarUrl ? (

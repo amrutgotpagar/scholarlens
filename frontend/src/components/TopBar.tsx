@@ -14,10 +14,10 @@ export function TopBar({ documents }: Props) {
     <header className="relative z-10 flex shrink-0 items-center justify-between overflow-hidden border-b border-slate-200/70 bg-white/60 px-5 py-3 backdrop-blur-md dark:border-slate-800/70 dark:bg-slate-950/50">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0"
+        className="animate-ambient-drift pointer-events-none absolute inset-0"
         style={{
           backgroundImage:
-            'radial-gradient(ellipse 420px 120px at 12% 0%, rgba(99,102,241,0.07), transparent 70%)',
+            'radial-gradient(ellipse 420px 120px at 12% 0%, rgba(99,102,241,0.09), transparent 70%), radial-gradient(ellipse 300px 100px at 88% 100%, rgba(167,139,250,0.07), transparent 70%)',
         }}
       />
       <div className="relative flex items-center gap-2.5">
@@ -36,7 +36,10 @@ export function TopBar({ documents }: Props) {
         {readyCount > 0 && (
           <div className="hidden items-center gap-3 rounded-full border border-slate-200/80 bg-white/70 px-3 py-1.5 text-[12px] text-slate-500 shadow-sm backdrop-blur-sm sm:flex dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-400">
             <span className="flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              </span>
               <span className="font-medium text-slate-700 dark:text-slate-200">{readyCount}</span>{' '}
               {readyCount === 1 ? 'paper' : 'papers'}
             </span>
