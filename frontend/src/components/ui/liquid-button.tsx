@@ -33,6 +33,23 @@ export interface LiquidButtonProps
   asChild?: boolean
 }
 
+// Margin lives outside the border box, so — unlike border/bg/padding, which are
+// harmless to apply to both the wrapper and Comp under border-box sizing — a
+// margin utility on Comp pushes it down/right *inside* the wrapper, inflating the
+// wrapper's own auto-height/width by that margin. The decorative overlays (sized
+// to fill the wrapper via inset-0) then extend into that gap, showing as a
+// larger ghost pill peeking out from behind the real button. Margin belongs only
+// on the wrapper, so it's stripped before the className reaches Comp.
+function withoutMargin(className?: string): string | undefined {
+  return className
+    ?.split(/\s+/)
+    .filter((token) => {
+      const base = token.slice(token.lastIndexOf(':') + 1)
+      return !/^-?m[trblxy]?-/.test(base)
+    })
+    .join(' ')
+}
+
 export const LiquidButton = React.forwardRef<HTMLButtonElement, LiquidButtonProps>(
   ({ className, variant, size, asChild = false, children, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button'
@@ -44,7 +61,6 @@ export const LiquidButton = React.forwardRef<HTMLButtonElement, LiquidButtonProp
       // w-full or margins need to land on the wrapper (Comp alone can't stretch an
       // inline-flex wrapper that's sized to hug it — that's circular), while visual
       // utilities like border/bg land on Comp where they're actually meant to render.
-      // Harmless overlap either way since they resolve independently per twMerge call.
       <span className={cn('group relative inline-flex rounded-full', className)}>
         <span
           aria-hidden
@@ -55,7 +71,11 @@ export const LiquidButton = React.forwardRef<HTMLButtonElement, LiquidButtonProp
           className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-full"
           style={{ backdropFilter: 'url("#liquid-glass-filter")' }}
         />
-        <Comp ref={ref} className={cn(liquidButtonVariants({ variant, size }), 'relative z-10', className)} {...props}>
+        <Comp
+          ref={ref}
+          className={cn(liquidButtonVariants({ variant, size }), 'relative z-10', withoutMargin(className))}
+          {...props}
+        >
           {children}
         </Comp>
       </span>

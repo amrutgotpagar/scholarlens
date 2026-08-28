@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowRight, Sparkles } from 'lucide-react'
+import { ArrowRight, Lock, Mail, Sparkles } from 'lucide-react'
 import { GoogleIcon } from '../components/GoogleIcon'
 import { LiquidButton } from '../components/ui/liquid-button'
 import { supabase } from '../lib/supabaseClient'
@@ -79,9 +79,18 @@ export default function AuthPage({ mode }: Props) {
           aria-hidden
           className="absolute inset-0"
           style={{
-            background:
-              'radial-gradient(circle at 20% 15%, rgba(129,140,248,0.35), transparent 55%), radial-gradient(circle at 85% 85%, rgba(167,139,250,0.25), transparent 50%)',
+            backgroundImage:
+              'radial-gradient(circle at 20% 15%, rgba(129,140,248,0.35), transparent 55%), radial-gradient(circle at 85% 85%, rgba(167,139,250,0.25), transparent 50%), radial-gradient(circle, rgba(255,255,255,0.14) 1px, transparent 1px)',
+            backgroundSize: 'auto, auto, 22px 22px',
           }}
+        />
+        <div
+          aria-hidden
+          className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-indigo-500/20 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="absolute -bottom-32 -left-16 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl"
         />
         <Link to="/" className="relative z-10 flex items-center gap-2 text-sm font-semibold tracking-tight">
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 shadow-md shadow-indigo-500/30">
@@ -140,7 +149,8 @@ export default function AuthPage({ mode }: Props) {
             ScholarLens
           </Link>
 
-          <div className="rounded-3xl border border-slate-200/80 bg-white/80 p-8 shadow-xl shadow-slate-900/[0.04] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60 dark:shadow-black/20">
+          <div className="rounded-[calc(1.5rem+1px)] bg-gradient-to-br from-indigo-200/70 via-white/40 to-violet-200/70 p-px shadow-xl shadow-slate-900/[0.06] dark:from-indigo-500/25 dark:via-white/5 dark:to-violet-500/20 dark:shadow-black/30">
+          <div className="rounded-3xl bg-white/90 p-8 backdrop-blur-xl dark:bg-slate-900/80">
             <h1 className="font-serif text-2xl font-semibold text-slate-900 sm:text-3xl dark:text-white">
               {isSignIn ? 'Welcome back' : 'Create your account'}
             </h1>
@@ -174,10 +184,12 @@ export default function AuthPage({ mode }: Props) {
                   {googleLoading ? 'Redirecting…' : 'Continue with Google'}
                 </LiquidButton>
 
-                <div className="my-6 flex items-center gap-3 text-xs text-slate-400 dark:text-slate-600">
-                  <span className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
-                  or
-                  <span className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
+                <div className="my-7 flex items-center gap-3">
+                  <span className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-200 dark:to-slate-800" />
+                  <span className="text-xs font-medium tracking-wide text-slate-400 uppercase dark:text-slate-500">
+                    or
+                  </span>
+                  <span className="h-px flex-1 bg-gradient-to-l from-transparent to-slate-200 dark:to-slate-800" />
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -190,34 +202,46 @@ export default function AuthPage({ mode }: Props) {
                     <label htmlFor="email" className="text-xs font-medium text-slate-600 dark:text-slate-400">
                       Email
                     </label>
-                    <input
-                      id="email"
-                      type="email"
-                      required
-                      autoComplete="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="you@university.edu"
-                      className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500 dark:focus:ring-indigo-500/20"
-                    />
+                    <div className="relative mt-1.5">
+                      <Mail
+                        size={16}
+                        className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-slate-400 dark:text-slate-500"
+                      />
+                      <input
+                        id="email"
+                        type="email"
+                        required
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@university.edu"
+                        className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-3.5 pl-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500 dark:focus:ring-indigo-500/20"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label htmlFor="password" className="text-xs font-medium text-slate-600 dark:text-slate-400">
                       Password
                     </label>
-                    <input
-                      id="password"
-                      type="password"
-                      required
-                      minLength={6}
-                      autoComplete={isSignIn ? 'current-password' : 'new-password'}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500 dark:focus:ring-indigo-500/20"
-                    />
+                    <div className="relative mt-1.5">
+                      <Lock
+                        size={16}
+                        className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-slate-400 dark:text-slate-500"
+                      />
+                      <input
+                        id="password"
+                        type="password"
+                        required
+                        minLength={6}
+                        autoComplete={isSignIn ? 'current-password' : 'new-password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-3.5 pl-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500 dark:focus:ring-indigo-500/20"
+                      />
+                    </div>
                   </div>
-                  <LiquidButton type="submit" variant="indigo" disabled={loading} className="group w-full">
+                  <LiquidButton type="submit" variant="indigo" disabled={loading} className="group mt-2 w-full">
                     {loading ? 'Please wait…' : isSignIn ? 'Sign in' : 'Create account'}
                     {!loading && (
                       <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
@@ -226,6 +250,7 @@ export default function AuthPage({ mode }: Props) {
                 </form>
               </>
             )}
+          </div>
           </div>
 
           <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
