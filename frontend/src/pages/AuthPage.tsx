@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowRight, Lock, Mail, Sparkles } from 'lucide-react'
+import { ArrowRight, Lock, Mail } from 'lucide-react'
 import { GoogleIcon } from '../components/GoogleIcon'
+import { Logomark } from '../components/Logomark'
 import { MetalButton } from '../components/ui/metal-button'
 import { supabase } from '../lib/supabaseClient'
 
@@ -93,9 +94,7 @@ export default function AuthPage({ mode }: Props) {
           className="absolute -bottom-32 -left-16 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl"
         />
         <Link to="/" className="relative z-10 flex items-center gap-2 text-sm font-semibold tracking-tight">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 shadow-md shadow-indigo-500/30">
-            <Sparkles size={14} />
-          </span>
+          <Logomark size={28} className="shadow-md shadow-indigo-500/30" />
           ScholarLens
         </Link>
 
@@ -143,9 +142,7 @@ export default function AuthPage({ mode }: Props) {
             to="/"
             className="mb-8 flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900 lg:hidden dark:text-white"
           >
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/30">
-              <Sparkles size={14} />
-            </span>
+            <Logomark size={28} className="shadow-md shadow-indigo-500/30" />
             ScholarLens
           </Link>
 

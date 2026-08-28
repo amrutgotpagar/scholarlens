@@ -18,8 +18,25 @@ async function parseErrorDetail(res: Response): Promise<string> {
   }
 }
 
+// getSession() refreshes an expired access token automatically as long as the
+// refresh token is still valid — a 401 past that point means Supabase itself
+// has rejected the session (refresh token expired/revoked, e.g. after sitting
+// idle for a long time). There's nothing left to retry with, so rather than
+// leave the app sitting in a half-signed-in state with a stray error banner,
+// clear the dead session and send the user back to sign in.
+let handlingExpiredSession = false
+async function handleExpiredSession(): Promise<never> {
+  if (!handlingExpiredSession) {
+    handlingExpiredSession = true
+    await supabase.auth.signOut()
+    window.location.assign('/sign-in')
+  }
+  throw new Error('Your session expired. Redirecting to sign in…')
+}
+
 export async function listDocuments(): Promise<DocumentOut[]> {
   const res = await fetch(`${API_BASE}/documents`, { headers: await authHeaders() })
+  if (res.status === 401) await handleExpiredSession()
   if (!res.ok) throw new Error(await parseErrorDetail(res))
   return res.json()
 }
@@ -42,6 +59,7 @@ export async function uploadDocument(file: File): Promise<DocumentOut> {
     headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
     body: JSON.stringify({ filename: file.name, content_type: file.type }),
   })
+  if (presignRes.status === 401) await handleExpiredSession()
   if (!presignRes.ok) throw new Error(await parseErrorDetail(presignRes))
   const presign: PresignResponse = await presignRes.json()
 
@@ -62,6 +80,7 @@ export async function uploadDocument(file: File): Promise<DocumentOut> {
     method: 'POST',
     headers: await authHeaders(),
   })
+  if (finalizeRes.status === 401) await handleExpiredSession()
   if (!finalizeRes.ok) throw new Error(await parseErrorDetail(finalizeRes))
   return finalizeRes.json()
 }
@@ -95,6 +114,7 @@ export async function* streamQuery(
     headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
     body: JSON.stringify({ question, document_id: documentId }),
   })
+  if (res.status === 401) await handleExpiredSession()
   if (!res.ok || !res.body) {
     throw new Error(await parseErrorDetail(res))
   }

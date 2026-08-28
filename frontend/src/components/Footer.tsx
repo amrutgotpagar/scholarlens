@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'framer-motion'
-import { ArrowUp, Sparkles } from 'lucide-react'
+import { ArrowUp } from 'lucide-react'
+import { Logomark } from './Logomark'
 
 const NAV_LINKS = [
   { title: 'Home', href: '/' },
@@ -54,9 +55,7 @@ export function Footer() {
               <AnimatedContainer delay={0}>
                 <div className="max-w-sm space-y-4">
                   <Link to="/" className="flex items-center gap-2 text-lg font-semibold text-white">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 shadow-md shadow-indigo-500/30">
-                      <Sparkles size={16} />
-                    </span>
+                    <Logomark size={32} className="shadow-md shadow-indigo-500/30" />
                     ScholarLens
                   </Link>
                   <p className="text-sm leading-relaxed text-white/45">

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Menu, Sparkles } from 'lucide-react'
+import { Menu } from 'lucide-react'
+import { Logomark } from './Logomark'
 import { useAuth } from '../hooks/useAuth'
 import { cn } from '../lib/utils'
 
@@ -78,16 +79,17 @@ export function AnimatedNav() {
             isExpanded ? 'opacity-100 delay-150' : 'pointer-events-none w-0 opacity-0',
           )}
         >
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 text-white shadow-sm shadow-indigo-500/30">
-            <Sparkles size={12} />
-          </span>
+          <Logomark size={24} className="shrink-0 shadow-sm shadow-indigo-500/30" />
           <div className="flex items-center gap-1 pr-3 pl-2 whitespace-nowrap sm:gap-3">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
                 onClick={(e) => e.stopPropagation()}
-                className="px-2 py-1 text-sm font-medium whitespace-nowrap text-white/75 transition-colors hover:text-white"
+                className={cn(
+                  'px-2 py-1 text-sm font-medium whitespace-nowrap transition-colors hover:text-white',
+                  user ? 'text-white' : 'text-white/75',
+                )}
               >
                 {item.name}
               </Link>
