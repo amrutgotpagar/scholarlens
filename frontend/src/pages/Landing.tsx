@@ -21,6 +21,7 @@ import { RevealHeading } from '../components/RevealHeading'
 import { ScrollScrubber } from '../components/ScrollScrubber'
 import { TiltCard } from '../components/TiltCard'
 import { LiquidButton } from '../components/ui/liquid-button'
+import { MetalButton } from '../components/ui/metal-button'
 
 const PAPERS = [
   'Attention Is All You Need',
@@ -269,7 +270,16 @@ export default function Landing() {
       </section>
 
       {/* CTA — the document stack visual gives "upload a paper" something to look at. */}
-      <section className="premium-bg relative overflow-hidden px-6 py-24 sm:px-10 sm:py-32">
+      <section className="relative overflow-hidden bg-slate-950 px-6 py-24 sm:px-10 sm:py-32">
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              'radial-gradient(ellipse 800px 500px at 15% 20%, rgba(99,102,241,0.25), transparent 60%), radial-gradient(ellipse 600px 500px at 90% 80%, rgba(167,139,250,0.18), transparent 55%), radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px)',
+            backgroundSize: 'auto, auto, 22px 22px',
+          }}
+        />
         <div className="relative mx-auto grid max-w-5xl items-center gap-10 lg:grid-cols-[1fr_auto] lg:text-left">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -280,22 +290,22 @@ export default function Landing() {
           >
           <RevealHeading
             text="Your papers are full of answers."
-            className="font-serif text-3xl font-semibold sm:text-5xl"
+            className="font-serif text-3xl font-semibold text-white sm:text-5xl"
           />
-          <p className="mx-auto mt-4 max-w-md text-slate-500 lg:mx-0 dark:text-slate-400">
+          <p className="mx-auto mt-4 max-w-md text-slate-400 lg:mx-0">
             Upload one and ask it something you'd normally have to skim ten pages to find.
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-            <LiquidButton asChild variant="dark">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
+            <MetalButton asChild variant="primary">
               <Link to="/app">
                 Open ScholarLens
                 <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
               </Link>
-            </LiquidButton>
+            </MetalButton>
             <LiquidButton
               asChild
               variant="light"
-              className="border border-slate-300 font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+              className="border border-white/10 bg-white/5 font-semibold text-white backdrop-blur-sm"
             >
               <Link to="/sign-up">Create an account</Link>
             </LiquidButton>
