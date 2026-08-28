@@ -1,7 +1,5 @@
-import { LogOut } from 'lucide-react'
+import { AccountMenu } from './AccountMenu'
 import { Logomark } from './Logomark'
-import { useAuth } from '../hooks/useAuth'
-import { supabase } from '../lib/supabaseClient'
 import type { DocumentOut } from '../types'
 
 interface Props {
@@ -11,10 +9,9 @@ interface Props {
 export function TopBar({ documents }: Props) {
   const readyCount = documents.filter((d) => d.status === 'ready').length
   const totalPages = documents.reduce((sum, d) => sum + (d.page_count ?? 0), 0)
-  const { user } = useAuth()
 
   return (
-    <header className="relative z-10 flex shrink-0 items-center justify-between overflow-hidden px-5 py-3">
+    <header className="relative z-10 flex shrink-0 items-center justify-between overflow-hidden border-b border-slate-200/70 bg-white/60 px-5 py-3 backdrop-blur-md dark:border-slate-800/70 dark:bg-slate-950/50">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -22,10 +19,6 @@ export function TopBar({ documents }: Props) {
           backgroundImage:
             'radial-gradient(ellipse 420px 120px at 12% 0%, rgba(99,102,241,0.07), transparent 70%)',
         }}
-      />
-      <div
-        aria-hidden
-        className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-indigo-200 to-transparent dark:via-indigo-500/20"
       />
       <div className="relative flex items-center gap-2.5">
         <Logomark size={32} className="shadow-md shadow-indigo-500/30" />
@@ -53,19 +46,7 @@ export function TopBar({ documents }: Props) {
             </span>
           </div>
         )}
-        {user && (
-          <div className="flex items-center gap-2">
-            <span className="hidden text-[12px] text-slate-400 sm:inline dark:text-slate-600">{user.email}</span>
-            <button
-              type="button"
-              onClick={() => supabase.auth.signOut()}
-              title="Sign out"
-              className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-300"
-            >
-              <LogOut size={15} />
-            </button>
-          </div>
-        )}
+        <AccountMenu />
       </div>
     </header>
   )

@@ -65,13 +65,15 @@ export function Workspace() {
           onPreview={setPreviewDocument}
           onDelete={handleDelete}
         />
-        <main className="premium-bg flex-1 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xl shadow-slate-900/5 dark:border-slate-800/80 dark:bg-slate-900 dark:shadow-black/30">
-          <QueryPanel
-            selectedDocumentId={selectedDocumentId}
-            selectedDocumentLabel={selectedDocumentLabel}
-            hasDocuments={documents.some((d) => d.status === 'ready')}
-          />
-        </main>
+        <div className="flex-1 overflow-hidden rounded-[17px] bg-gradient-to-br from-indigo-200/60 via-white/40 to-violet-200/60 p-px shadow-xl shadow-slate-900/5 dark:from-indigo-500/20 dark:via-white/5 dark:to-violet-500/15 dark:shadow-black/30">
+          <main className="premium-bg h-full overflow-hidden rounded-2xl bg-white dark:bg-slate-900">
+            <QueryPanel
+              selectedDocumentId={selectedDocumentId}
+              selectedDocumentLabel={selectedDocumentLabel}
+              hasDocuments={documents.some((d) => d.status === 'ready')}
+            />
+          </main>
+        </div>
       </div>
       <PdfPreviewModal document={previewDocument} onClose={() => setPreviewDocument(null)} />
     </div>

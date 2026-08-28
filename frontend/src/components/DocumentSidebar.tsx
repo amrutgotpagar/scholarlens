@@ -54,7 +54,8 @@ export function DocumentSidebar({
   }
 
   return (
-    <aside className="flex h-full w-80 shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xl shadow-slate-900/5 dark:border-slate-800/80 dark:bg-slate-900 dark:shadow-black/30">
+    <div className="h-full w-80 shrink-0 rounded-[17px] bg-gradient-to-br from-indigo-200/60 via-white/40 to-violet-200/60 p-px shadow-xl shadow-slate-900/5 dark:from-indigo-500/20 dark:via-white/5 dark:to-violet-500/15 dark:shadow-black/30">
+    <aside className="flex h-full flex-col overflow-hidden rounded-2xl bg-white dark:bg-slate-900">
       <div className="p-4">
         <button
           type="button"
@@ -215,5 +216,6 @@ export function DocumentSidebar({
         </div>
       </div>
     </aside>
+    </div>
   )
 }
