@@ -18,12 +18,31 @@ async function parseErrorDetail(res: Response): Promise<string> {
   }
 }
 
-// getSession() refreshes an expired access token automatically as long as the
-// refresh token is still valid — a 401 past that point means Supabase itself
-// has rejected the session (refresh token expired/revoked, e.g. after sitting
-// idle for a long time). There's nothing left to retry with, so rather than
-// leave the app sitting in a half-signed-in state with a stray error banner,
-// clear the dead session and send the user back to sign in.
+/** A brand-new access token has occasionally 401'd on the very first request
+ * right after sign-in (seen in practice — a transient issue, not a genuinely
+ * dead session, since the same token works moments later). Rather than treat
+ * every 401 as "the session is dead," force a refresh and retry once before
+ * giving up — this absorbs that transient case without extra cost for the
+ * common one (a real, live session that just needed a fresh token). */
+async function fetchWithAuth(path: string, init: RequestInit = {}): Promise<Response> {
+  const attempt = async () =>
+    fetch(`${API_BASE}${path}`, { ...init, headers: { ...init.headers, ...(await authHeaders()) } })
+
+  let res = await attempt()
+  if (res.status === 401) {
+    const { data, error } = await supabase.auth.refreshSession()
+    if (!error && data.session) {
+      res = await attempt()
+    }
+  }
+  return res
+}
+
+// Only reached once a fresh token (via refreshSession above) has ALSO been
+// rejected — at that point the session really is unrecoverable (refresh token
+// itself expired/revoked), so there's nothing left to retry with. Sign out
+// and send the user back to sign in instead of leaving the app stuck showing
+// a signed-in-looking UI where every request quietly fails.
 let handlingExpiredSession = false
 async function handleExpiredSession(): Promise<never> {
   if (!handlingExpiredSession) {
@@ -35,7 +54,7 @@ async function handleExpiredSession(): Promise<never> {
 }
 
 export async function listDocuments(): Promise<DocumentOut[]> {
-  const res = await fetch(`${API_BASE}/documents`, { headers: await authHeaders() })
+  const res = await fetchWithAuth('/documents')
   if (res.status === 401) await handleExpiredSession()
   if (!res.ok) throw new Error(await parseErrorDetail(res))
   return res.json()
@@ -54,9 +73,9 @@ interface PresignResponse {
  * 3. tell the backend the upload landed, so it can fetch the object from S3 once and
  *    run extraction/chunking/embedding */
 export async function uploadDocument(file: File): Promise<DocumentOut> {
-  const presignRes = await fetch(`${API_BASE}/documents/presign`, {
+  const presignRes = await fetchWithAuth('/documents/presign', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ filename: file.name, content_type: file.type }),
   })
   if (presignRes.status === 401) await handleExpiredSession()
@@ -76,10 +95,7 @@ export async function uploadDocument(file: File): Promise<DocumentOut> {
     throw new Error(`Upload to storage failed (${uploadRes.status})`)
   }
 
-  const finalizeRes = await fetch(`${API_BASE}/documents/${presign.document_id}/finalize`, {
-    method: 'POST',
-    headers: await authHeaders(),
-  })
+  const finalizeRes = await fetchWithAuth(`/documents/${presign.document_id}/finalize`, { method: 'POST' })
   if (finalizeRes.status === 401) await handleExpiredSession()
   if (!finalizeRes.ok) throw new Error(await parseErrorDetail(finalizeRes))
   return finalizeRes.json()
@@ -109,9 +125,9 @@ export async function* streamQuery(
   question: string,
   documentId: string | null,
 ): AsyncGenerator<QueryStreamEvent> {
-  const res = await fetch(`${API_BASE}/query/stream`, {
+  const res = await fetchWithAuth('/query/stream', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ question, document_id: documentId }),
   })
   if (res.status === 401) await handleExpiredSession()
