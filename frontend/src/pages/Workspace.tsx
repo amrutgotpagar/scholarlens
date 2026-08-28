@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { listDocuments, uploadDocument } from '../api'
+import { deleteDocument, listDocuments, uploadDocument } from '../api'
 import { DocumentSidebar } from '../components/DocumentSidebar'
 import { PdfPreviewModal } from '../components/PdfPreviewModal'
 import { QueryPanel } from '../components/QueryPanel'
@@ -38,6 +38,16 @@ export function Workspace() {
     }
   }
 
+  const handleDelete = async (document: DocumentOut) => {
+    if (selectedDocumentId === document.id) setSelectedDocumentId(null)
+    setDocuments((prev) => prev.filter((d) => d.id !== document.id)) // optimistic — a stuck row should disappear immediately
+    try {
+      await deleteDocument(document.id)
+    } catch {
+      await refreshDocuments() // restore the real state if the delete didn't actually go through
+    }
+  }
+
   const selectedDocument = documents.find((d) => d.id === selectedDocumentId)
   const selectedDocumentLabel = selectedDocument ? selectedDocument.title ?? selectedDocument.filename : 'All documents'
 
@@ -53,6 +63,7 @@ export function Workspace() {
           uploading={uploading}
           uploadError={uploadError}
           onPreview={setPreviewDocument}
+          onDelete={handleDelete}
         />
         <main className="premium-bg flex-1 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xl shadow-slate-900/5 dark:border-slate-800/80 dark:bg-slate-900 dark:shadow-black/30">
           <QueryPanel

@@ -1,4 +1,4 @@
-import { AlertCircle, CheckCircle2, Clock, Eye, FileText, Lightbulb, Loader2, UploadCloud } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Clock, Eye, FileText, Lightbulb, Loader2, Trash2, UploadCloud } from 'lucide-react'
 import { useRef, useState } from 'react'
 import type { DocumentOut } from '../types'
 
@@ -33,6 +33,7 @@ interface Props {
   uploading: boolean
   uploadError: string | null
   onPreview: (document: DocumentOut) => void
+  onDelete: (document: DocumentOut) => void
 }
 
 export function DocumentSidebar({
@@ -43,6 +44,7 @@ export function DocumentSidebar({
   uploading,
   uploadError,
   onPreview,
+  onDelete,
 }: Props) {
   const [dragOver, setDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -136,7 +138,7 @@ export function DocumentSidebar({
               <button
                 type="button"
                 onClick={() => onSelectDocument(doc.id)}
-                className={`w-full px-3 py-2.5 text-left ${doc.status === 'ready' ? 'pr-9' : ''}`}
+                className={`w-full px-3 py-2.5 text-left ${doc.status === 'ready' ? 'pr-16' : 'pr-9'}`}
               >
                 <div className="flex items-start gap-2">
                   <FileText
@@ -166,16 +168,30 @@ export function DocumentSidebar({
                   </div>
                 </div>
               </button>
-              {doc.status === 'ready' && (
+              <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                {doc.status === 'ready' && (
+                  <button
+                    type="button"
+                    onClick={() => onPreview(doc)}
+                    aria-label="Preview PDF"
+                    className="rounded-md p-1.5 text-slate-400 hover:bg-slate-200/70 hover:text-slate-600 dark:text-slate-500 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+                  >
+                    <Eye size={14} />
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={() => onPreview(doc)}
-                  aria-label="Preview PDF"
-                  className="absolute top-1/2 right-2 -translate-y-1/2 rounded-md p-1.5 text-slate-400 opacity-0 transition-opacity hover:bg-slate-200/70 hover:text-slate-600 group-hover:opacity-100 dark:text-slate-500 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+                  onClick={() => {
+                    if (window.confirm(`Delete "${doc.title ?? doc.filename}"? This can't be undone.`)) {
+                      onDelete(doc)
+                    }
+                  }}
+                  aria-label="Delete document"
+                  className="rounded-md p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 dark:text-slate-500 dark:hover:bg-red-500/10 dark:hover:text-red-400"
                 >
-                  <Eye size={14} />
+                  <Trash2 size={14} />
                 </button>
-              )}
+              </div>
             </div>
           )
         })}

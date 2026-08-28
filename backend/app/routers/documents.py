@@ -173,3 +173,19 @@ def get_document_file(
         raise HTTPException(status_code=404, detail="File not found")
     url = s3.create_presigned_download(document.s3_key)
     return RedirectResponse(url=url, status_code=307)
+
+
+@router.delete("/{document_id}", status_code=204)
+def delete_document(
+    document_id: str, db: Session = Depends(get_db), user_id: str = Depends(get_current_user_id)
+) -> None:
+    """Removes a document and its chunks (cascade). Also the only way to clear a row
+    stuck at PENDING/PROCESSING forever — e.g. finalize never completed because the
+    request dropped mid-flight (a cold-starting free-tier backend, a lost connection) —
+    since finalize itself is only ever called once, right after upload, with no retry."""
+    document = _get_owned_document(db, document_id, user_id)
+    # Safe even if the object was never actually uploaded (a stuck PENDING row) or was
+    # already removed (a FAILED one) — S3 DeleteObject is a no-op on a missing key.
+    s3.delete_object(document.s3_key)
+    db.delete(document)
+    db.commit()

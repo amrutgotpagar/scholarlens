@@ -60,6 +60,12 @@ export async function listDocuments(): Promise<DocumentOut[]> {
   return res.json()
 }
 
+export async function deleteDocument(documentId: string): Promise<void> {
+  const res = await fetchWithAuth(`/documents/${documentId}`, { method: 'DELETE' })
+  if (res.status === 401) await handleExpiredSession()
+  if (!res.ok) throw new Error(await parseErrorDetail(res))
+}
+
 interface PresignResponse {
   document_id: string
   upload_url: string
