@@ -45,7 +45,7 @@ export const LiquidButton = React.forwardRef<HTMLButtonElement, LiquidButtonProp
       // inline-flex wrapper that's sized to hug it — that's circular), while visual
       // utilities like border/bg land on Comp where they're actually meant to render.
       // Harmless overlap either way since they resolve independently per twMerge call.
-      <span className={cn('group relative inline-flex', className)}>
+      <span className={cn('group relative inline-flex rounded-full', className)}>
         <span
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-full shadow-[inset_2px_2px_1px_-1px_rgba(255,255,255,0.6),inset_-2px_-2px_1px_-1px_rgba(0,0,0,0.2),0_2px_8px_rgba(0,0,0,0.12)] transition-opacity group-hover:opacity-80"

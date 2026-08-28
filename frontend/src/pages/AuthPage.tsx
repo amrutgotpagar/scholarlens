@@ -115,11 +115,24 @@ export default function AuthPage({ mode }: Props) {
       </div>
 
       {/* Form panel */}
-      <div className="flex flex-1 flex-col items-center justify-center px-6 py-16 sm:px-10">
-        <div className="w-full max-w-sm">
+      <div className="relative flex flex-1 flex-col items-center justify-center px-6 py-16 sm:px-10">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(ellipse 520px 360px at 50% 0%, rgba(99,102,241,0.08), transparent 60%)',
+          }}
+        />
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="relative w-full max-w-sm"
+        >
           <Link
             to="/"
-            className="mb-10 flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900 lg:hidden dark:text-white"
+            className="mb-8 flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900 lg:hidden dark:text-white"
           >
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/30">
               <Sparkles size={14} />
@@ -127,91 +140,95 @@ export default function AuthPage({ mode }: Props) {
             ScholarLens
           </Link>
 
-          <h1 className="font-serif text-2xl font-semibold text-slate-900 sm:text-3xl dark:text-white">
-            {isSignIn ? 'Welcome back' : 'Create your account'}
-          </h1>
-          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            {isSignIn
-              ? 'Sign in to pick up where you left off.'
-              : 'A few seconds, then straight to your papers.'}
-          </p>
+          <div className="rounded-3xl border border-slate-200/80 bg-white/80 p-8 shadow-xl shadow-slate-900/[0.04] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60 dark:shadow-black/20">
+            <h1 className="font-serif text-2xl font-semibold text-slate-900 sm:text-3xl dark:text-white">
+              {isSignIn ? 'Welcome back' : 'Create your account'}
+            </h1>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+              {isSignIn
+                ? 'Sign in to pick up where you left off.'
+                : 'A few seconds, then straight to your papers.'}
+            </p>
 
-          {checkEmail ? (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-8 rounded-xl border border-indigo-200 bg-indigo-50 p-5 text-sm text-indigo-900 dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-200"
-            >
-              <p className="font-medium">Check your inbox.</p>
-              <p className="mt-1 text-indigo-700/80 dark:text-indigo-300/70">
-                We sent a confirmation link to {email}. Click it, then sign in.
-              </p>
-            </motion.div>
-          ) : (
-            <>
-              <LiquidButton
-                type="button"
-                variant="light"
-                disabled={googleLoading}
-                onClick={handleGoogleSignIn}
-                className="mt-8 w-full border border-slate-200 font-medium text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+            {checkEmail ? (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-8 rounded-xl border border-indigo-200 bg-indigo-50 p-5 text-sm text-indigo-900 dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-200"
               >
-                <GoogleIcon size={16} />
-                {googleLoading ? 'Redirecting…' : 'Continue with Google'}
-              </LiquidButton>
+                <p className="font-medium">Check your inbox.</p>
+                <p className="mt-1 text-indigo-700/80 dark:text-indigo-300/70">
+                  We sent a confirmation link to {email}. Click it, then sign in.
+                </p>
+              </motion.div>
+            ) : (
+              <>
+                <LiquidButton
+                  type="button"
+                  variant="light"
+                  disabled={googleLoading}
+                  onClick={handleGoogleSignIn}
+                  className="mt-8 w-full border border-slate-200 font-medium text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                >
+                  <GoogleIcon size={16} />
+                  {googleLoading ? 'Redirecting…' : 'Continue with Google'}
+                </LiquidButton>
 
-              <div className="my-6 flex items-center gap-3 text-xs text-slate-400 dark:text-slate-600">
-                <span className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
-                or
-                <span className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
-              </div>
+                <div className="my-6 flex items-center gap-3 text-xs text-slate-400 dark:text-slate-600">
+                  <span className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
+                  or
+                  <span className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
+                </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {error && (
-                  <div className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
-                    {error}
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {error && (
+                    <div className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
+                      {error}
+                    </div>
+                  )}
+                  <div>
+                    <label htmlFor="email" className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                      Email
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      required
+                      autoComplete="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@university.edu"
+                      className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500 dark:focus:ring-indigo-500/20"
+                    />
                   </div>
-                )}
-                <div>
-                <label htmlFor="email" className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                  Email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@university.edu"
-                  className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-600 dark:focus:ring-indigo-500/20"
-                />
-              </div>
-              <div>
-                <label htmlFor="password" className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                  Password
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  required
-                  minLength={6}
-                  autoComplete={isSignIn ? 'current-password' : 'new-password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-600 dark:focus:ring-indigo-500/20"
-                />
-              </div>
-              <LiquidButton type="submit" variant="dark" disabled={loading} className="group w-full">
-                {loading ? 'Please wait…' : isSignIn ? 'Sign in' : 'Create account'}
-                {!loading && <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />}
-              </LiquidButton>
-              </form>
-            </>
-          )}
+                  <div>
+                    <label htmlFor="password" className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                      Password
+                    </label>
+                    <input
+                      id="password"
+                      type="password"
+                      required
+                      minLength={6}
+                      autoComplete={isSignIn ? 'current-password' : 'new-password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500 dark:focus:ring-indigo-500/20"
+                    />
+                  </div>
+                  <LiquidButton type="submit" variant="indigo" disabled={loading} className="group w-full">
+                    {loading ? 'Please wait…' : isSignIn ? 'Sign in' : 'Create account'}
+                    {!loading && (
+                      <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+                    )}
+                  </LiquidButton>
+                </form>
+              </>
+            )}
+          </div>
 
-          <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
             {isSignIn ? "Don't have an account? " : 'Already have an account? '}
             <Link
               to={isSignIn ? '/sign-up' : '/sign-in'}
@@ -220,7 +237,7 @@ export default function AuthPage({ mode }: Props) {
               {isSignIn ? 'Sign up' : 'Sign in'}
             </Link>
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   )
