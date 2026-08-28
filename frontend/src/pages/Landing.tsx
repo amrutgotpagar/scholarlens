@@ -68,7 +68,6 @@ export default function Landing() {
     offset: ['start start', 'end end'],
   })
 
-  const eyebrowOpacity = useTransform(scrollYProgress, [0, 0.1, 0.62, 0.74], [0, 1, 1, 0])
   const titleOpacity = useTransform(scrollYProgress, [0, 0.1, 0.62, 0.74], [0, 1, 1, 0])
   const titleY = useTransform(scrollYProgress, [0, 0.1], [24, 0])
   const subtitleOpacity = useTransform(scrollYProgress, [0.08, 0.18, 0.62, 0.74], [0, 1, 1, 0])
@@ -86,13 +85,6 @@ export default function Landing() {
           <CornerFrame color="rgba(255,255,255,0.55)" size={22} inset={28} alwaysOn />
         </motion.div>
         <div className="relative z-10 mx-auto w-full max-w-4xl px-6 text-center sm:px-10">
-          <motion.span
-            style={{ opacity: eyebrowOpacity }}
-            className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/25 px-3.5 py-1.5 text-[11px] font-medium tracking-[0.15em] text-white/70 uppercase"
-          >
-            <Sparkles size={11} className="text-indigo-300" />
-            Grounded Q&amp;A for arXiv research
-          </motion.span>
           <motion.h1
             style={{ opacity: titleOpacity, y: titleY }}
             className="font-serif text-4xl leading-[1.1] font-semibold text-white text-shadow-lg sm:text-6xl md:text-7xl"
