@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowRight, Lock, Mail, Sparkles } from 'lucide-react'
 import { GoogleIcon } from '../components/GoogleIcon'
-import { LiquidButton } from '../components/ui/liquid-button'
+import { MetalButton } from '../components/ui/metal-button'
 import { supabase } from '../lib/supabaseClient'
 
 interface Props {
@@ -173,16 +173,16 @@ export default function AuthPage({ mode }: Props) {
               </motion.div>
             ) : (
               <>
-                <LiquidButton
+                <MetalButton
                   type="button"
-                  variant="light"
+                  variant="primary"
                   disabled={googleLoading}
                   onClick={handleGoogleSignIn}
-                  className="mt-8 w-full border border-slate-200 font-medium text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                  className="mt-8 w-full"
                 >
                   <GoogleIcon size={16} />
                   {googleLoading ? 'Redirecting…' : 'Continue with Google'}
-                </LiquidButton>
+                </MetalButton>
 
                 <div className="my-7 flex items-center gap-3">
                   <span className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-200 dark:to-slate-800" />
@@ -241,12 +241,17 @@ export default function AuthPage({ mode }: Props) {
                       />
                     </div>
                   </div>
-                  <LiquidButton type="submit" variant="indigo" disabled={loading} className="group mt-2 w-full">
+                  <MetalButton
+                    type="submit"
+                    variant="muted"
+                    disabled={loading}
+                    className="group mt-2 w-full"
+                  >
                     {loading ? 'Please wait…' : isSignIn ? 'Sign in' : 'Create account'}
                     {!loading && (
                       <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
                     )}
-                  </LiquidButton>
+                  </MetalButton>
                 </form>
               </>
             )}

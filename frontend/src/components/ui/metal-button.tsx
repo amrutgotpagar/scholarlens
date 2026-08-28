@@ -52,7 +52,15 @@ export const MetalButton = React.forwardRef<HTMLButtonElement, MetalButtonProps>
         onMouseLeave={magnetic.onMouseLeave}
         whileHover={{ scale: 1.04 }}
         whileTap={{ scale: 0.97 }}
-        className={cn('group inline-block', className)}
+        // inline-flex, not inline-block: an inline-block's width is shrink-to-fit
+        // (indeterminate) when nothing forces it, and a w-full percentage child
+        // inside an indeterminate box can resolve to a real zero instead of
+        // falling back to content size — which silently zeroes the shader
+        // canvas's measured container size. A flex formatting context always
+        // resolves to a definite width first, so w-full below is safe whether
+        // this wrapper ends up auto-width (no className) or stretched (w-full
+        // passed in via className).
+        className={cn('group inline-flex', className)}
       >
         {/* The chrome ring (shader + padding) wraps Comp rather than the other way
          * round — Comp's only child is {children} itself (the caller's Link/text),
@@ -60,7 +68,7 @@ export const MetalButton = React.forwardRef<HTMLButtonElement, MetalButtonProps>
          * single child it's given, so nesting {children} any deeper here would
          * merge onto a decorative wrapper div instead of the real link/button. */}
         <div
-          className="relative overflow-hidden rounded-full shadow-[0_20px_50px_-12px_rgba(79,70,229,0.45)]"
+          className="relative w-full overflow-hidden rounded-full shadow-[0_20px_50px_-12px_rgba(79,70,229,0.45)]"
           style={{ padding: 3 }}
         >
           <LiquidMetal
@@ -74,7 +82,7 @@ export const MetalButton = React.forwardRef<HTMLButtonElement, MetalButtonProps>
           <Comp
             ref={ref}
             className={cn(
-              'relative z-10 flex items-center justify-center rounded-full font-semibold whitespace-nowrap transition-colors duration-200 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+              'relative z-10 flex w-full items-center justify-center rounded-full font-semibold whitespace-nowrap transition-colors duration-200 [&_svg]:pointer-events-none [&_svg]:shrink-0',
               sizeStyles[size],
               variant === 'muted'
                 ? 'bg-indigo-950/85 text-indigo-100 group-hover:bg-indigo-900/85'

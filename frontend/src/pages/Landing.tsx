@@ -20,7 +20,6 @@ import { RetrievalGraph3D } from '../components/RetrievalGraph3D'
 import { RevealHeading } from '../components/RevealHeading'
 import { ScrollScrubber } from '../components/ScrollScrubber'
 import { TiltCard } from '../components/TiltCard'
-import { LiquidButton } from '../components/ui/liquid-button'
 import { MetalButton } from '../components/ui/metal-button'
 
 const PAPERS = [
@@ -306,13 +305,9 @@ export default function Landing() {
                 <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
               </Link>
             </MetalButton>
-            <LiquidButton
-              asChild
-              variant="light"
-              className="border border-white/10 bg-white/5 font-semibold text-white backdrop-blur-sm"
-            >
+            <MetalButton asChild variant="muted">
               <Link to="/sign-up">Create an account</Link>
-            </LiquidButton>
+            </MetalButton>
           </div>
           </motion.div>
           <motion.div
