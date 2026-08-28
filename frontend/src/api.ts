@@ -17,12 +17,43 @@ export async function listDocuments(): Promise<DocumentOut[]> {
   return res.json()
 }
 
+interface PresignResponse {
+  document_id: string
+  upload_url: string
+  upload_fields: Record<string, string>
+}
+
+/** Three steps, none of which route the raw file through our backend:
+ * 1. ask the backend for a presigned S3 POST (scoped to this exact filename/content-type,
+ *    with size limits enforced by S3 itself, not just trusted from the client)
+ * 2. upload the file directly to S3 with that presigned POST
+ * 3. tell the backend the upload landed, so it can fetch the object from S3 once and
+ *    run extraction/chunking/embedding */
 export async function uploadDocument(file: File): Promise<DocumentOut> {
+  const presignRes = await fetch(`${API_BASE}/documents/presign`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ filename: file.name, content_type: file.type }),
+  })
+  if (!presignRes.ok) throw new Error(await parseErrorDetail(presignRes))
+  const presign: PresignResponse = await presignRes.json()
+
   const formData = new FormData()
-  formData.append('file', file)
-  const res = await fetch(`${API_BASE}/documents`, { method: 'POST', body: formData })
-  if (!res.ok) throw new Error(await parseErrorDetail(res))
-  return res.json()
+  for (const [key, value] of Object.entries(presign.upload_fields)) {
+    formData.append(key, value)
+  }
+  formData.append('file', file) // must be appended last per S3's presigned POST requirements
+
+  const uploadRes = await fetch(presign.upload_url, { method: 'POST', body: formData })
+  if (!uploadRes.ok) {
+    throw new Error(`Upload to storage failed (${uploadRes.status})`)
+  }
+
+  const finalizeRes = await fetch(`${API_BASE}/documents/${presign.document_id}/finalize`, {
+    method: 'POST',
+  })
+  if (!finalizeRes.ok) throw new Error(await parseErrorDetail(finalizeRes))
+  return finalizeRes.json()
 }
 
 export async function submitFeedback(

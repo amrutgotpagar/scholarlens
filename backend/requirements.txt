@@ -12,3 +12,4 @@ openai==1.60.2
 python-multipart==0.0.20
 tenacity==9.0.0
 python-dotenv==1.0.1
+boto3==1.35.99

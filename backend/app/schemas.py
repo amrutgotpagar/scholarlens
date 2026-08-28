@@ -19,6 +19,20 @@ class DocumentOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class PresignUploadRequest(BaseModel):
+    filename: str = Field(min_length=1, max_length=255)
+    content_type: str
+
+
+class PresignUploadResponse(BaseModel):
+    document_id: uuid.UUID
+    upload_url: str
+    # The exact form fields the client must include in the multipart POST to S3 (signature,
+    # policy, Content-Type, etc.) — S3 presigned POST, not a raw PUT, so size/type limits are
+    # enforced by S3 itself rather than merely trusted from the client. See app/storage/s3.py.
+    upload_fields: dict[str, str]
+
+
 class QueryRequest(BaseModel):
     question: str = Field(min_length=1, max_length=2000)
     document_id: uuid.UUID | None = None

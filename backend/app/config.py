@@ -43,7 +43,16 @@ class Settings(BaseSettings):
     max_upload_bytes: int = 25 * 1024 * 1024
     allowed_upload_content_types: tuple[str, ...] = ("application/pdf",)
 
-    cors_allow_origins: tuple[str, ...] = ("http://localhost:5173",)
+    # The frontend's actual dev-server origin varies by machine (Vite's default 5173 is
+    # frequently already taken, landing on a different port) — set via env rather than
+    # hardcoding one guess. Locked to explicit origin(s), never "*", even in dev.
+    cors_allow_origins: tuple[str, ...] = ("http://localhost:5173", "http://localhost:5180")
+
+    aws_region: str = "eu-north-1"
+    s3_bucket_name: str = ""
+    # How long a presigned upload/download URL stays valid for.
+    presigned_upload_expires_seconds: int = 300
+    presigned_download_expires_seconds: int = 300
 
     # Per-client-IP, in-memory (see app/middleware.py for why IP rather than user).
     rate_limit_requests: int = 30

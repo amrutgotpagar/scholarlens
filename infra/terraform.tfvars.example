@@ -1,0 +1,11 @@
+# Copy to terraform.tfvars (gitignored) and fill in.
+
+aws_region  = "eu-north-1"
+# Must be globally unique across ALL AWS accounts — e.g. suffix with your account ID.
+bucket_name = "rag-arxiv-qa-uploads-CHANGE-ME"
+environment = "dev"
+
+# List every port your dev server actually runs on — no wildcard port support (verified
+# live: S3 rejects a real CORS preflight for "http://localhost:*" despite accepting the
+# syntax at apply time). Add your current port here if it's not one of these.
+allowed_origins = ["http://localhost:5173", "http://localhost:5180"]
