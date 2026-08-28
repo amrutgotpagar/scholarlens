@@ -13,6 +13,7 @@ export function Workspace() {
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [previewDocument, setPreviewDocument] = useState<DocumentOut | null>(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const refreshDocuments = async () => {
     try {
@@ -55,19 +56,35 @@ export function Workspace() {
   return (
     <div className="premium-bg flex h-screen w-screen flex-col overflow-hidden bg-slate-100 dark:bg-black">
       <motion.div initial={{ y: -16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.4, ease: 'easeOut' }}>
-        <TopBar documents={documents} />
+        <TopBar documents={documents} onToggleSidebar={() => setSidebarOpen((v) => !v)} />
       </motion.div>
-      <div className="flex flex-1 gap-3 overflow-hidden p-3">
+      <div className="relative flex flex-1 gap-3 overflow-hidden p-3">
+        {/* Mobile backdrop — the sidebar itself is a fixed drawer below md, static
+         * in-flow above it (the two-panel side-by-side layout has no room to spare
+         * on a phone-width screen). */}
+        {sidebarOpen && (
+          <button
+            type="button"
+            aria-label="Close sidebar"
+            onClick={() => setSidebarOpen(false)}
+            className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm md:hidden"
+          />
+        )}
         <motion.div
-          initial={{ x: -16, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.45, delay: 0.1, ease: 'easeOut' }}
-          className="shrink-0"
+          className={`fixed inset-y-3 left-3 z-50 transition-transform duration-300 ease-out md:static md:z-auto md:translate-x-0 ${
+            sidebarOpen ? 'translate-x-0' : '-translate-x-[calc(100%_+_0.75rem)]'
+          }`}
         >
           <DocumentSidebar
             documents={documents}
             selectedDocumentId={selectedDocumentId}
-            onSelectDocument={setSelectedDocumentId}
+            onSelectDocument={(id) => {
+              setSelectedDocumentId(id)
+              setSidebarOpen(false) // a document pick should return focus to the chat on mobile
+            }}
             onUpload={handleUpload}
             uploading={uploading}
             uploadError={uploadError}

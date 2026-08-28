@@ -1,12 +1,14 @@
+import { Menu } from 'lucide-react'
 import { AccountMenu } from './AccountMenu'
 import { Logomark } from './Logomark'
 import type { DocumentOut } from '../types'
 
 interface Props {
   documents: DocumentOut[]
+  onToggleSidebar: () => void
 }
 
-export function TopBar({ documents }: Props) {
+export function TopBar({ documents, onToggleSidebar }: Props) {
   const readyCount = documents.filter((d) => d.status === 'ready').length
   const totalPages = documents.reduce((sum, d) => sum + (d.page_count ?? 0), 0)
 
@@ -25,6 +27,14 @@ export function TopBar({ documents }: Props) {
         />
       </div>
       <div className="relative flex items-center gap-2.5">
+        <button
+          type="button"
+          onClick={onToggleSidebar}
+          aria-label="Toggle document library"
+          className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 md:hidden dark:text-slate-400 dark:hover:bg-slate-800"
+        >
+          <Menu size={18} />
+        </button>
         <Logomark size={32} className="shadow-md shadow-indigo-500/30" />
         <div>
           <h1 className="font-serif text-[16px] leading-tight font-semibold tracking-tight text-slate-900 dark:text-white">
