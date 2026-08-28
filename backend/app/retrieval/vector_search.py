@@ -11,6 +11,7 @@ def vector_search(
     query_embedding: list[float],
     top_k: int,
     document_id: uuid.UUID | None = None,
+    owner_id: str | None = None,
 ) -> list[Chunk]:
     """Return the top_k chunks ranked by cosine distance to query_embedding, nearest first."""
     stmt = (
@@ -22,4 +23,6 @@ def vector_search(
     )
     if document_id is not None:
         stmt = stmt.where(Chunk.document_id == document_id)
+    if owner_id is not None:
+        stmt = stmt.where(Document.owner_id == owner_id)
     return list(db.scalars(stmt))

@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
+from app.auth import get_current_user_id
 from app.config import get_settings
 from app.db.models import Chunk, Document, DocumentStatus
 from app.db.session import get_db
@@ -20,15 +21,28 @@ settings = get_settings()
 PDF_MAGIC_BYTES = b"%PDF-"
 
 
+def _get_owned_document(db: Session, document_id: str, user_id: str) -> Document:
+    """404, not 403, on a document that exists but belongs to someone else — same
+    response either way so ownership can't be probed by id."""
+    document = db.get(Document, document_id)
+    if document is None or str(document.owner_id) != user_id:
+        raise HTTPException(status_code=404, detail="Document not found")
+    return document
+
+
 @router.post("/presign", response_model=PresignUploadResponse)
-def presign_upload(request: PresignUploadRequest, db: Session = Depends(get_db)) -> PresignUploadResponse:
+def presign_upload(
+    request: PresignUploadRequest,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user_id),
+) -> PresignUploadResponse:
     """Step 1 of 3: issue an S3 presigned POST. The browser uploads straight to S3 next —
     raw bytes never touch this backend. See POST /{document_id}/finalize for step 3."""
     if request.content_type not in settings.allowed_upload_content_types:
         raise HTTPException(status_code=415, detail=f"Unsupported content type: {request.content_type}")
 
     document_id = uuid.uuid4()
-    object_key = s3.build_object_key(document_id)
+    object_key = s3.build_object_key(user_id, document_id)
 
     document = Document(
         id=document_id,
@@ -38,6 +52,7 @@ def presign_upload(request: PresignUploadRequest, db: Session = Depends(get_db))
         byte_size=0,  # unknown until the upload lands in S3 — set for real in /finalize
         status=DocumentStatus.PENDING,
         s3_key=object_key,
+        owner_id=user_id,
     )
     db.add(document)
     db.commit()
@@ -55,6 +70,7 @@ def finalize_upload(
     document_id: str,
     db: Session = Depends(get_db),
     embedding_provider: EmbeddingProvider = Depends(get_embedding_provider),
+    user_id: str = Depends(get_current_user_id),
 ) -> Document:
     """Step 3 of 3: called by the client once its direct-to-S3 upload (step 2) has
     completed. Fetches the object from S3 exactly once, validates it's genuinely a PDF
@@ -62,9 +78,7 @@ def finalize_upload(
     client could still lie about content type — real bytes are checked here), and runs
     the same extract/chunk/embed pipeline the old direct-upload endpoint used to run
     inline."""
-    document = db.get(Document, document_id)
-    if document is None:
-        raise HTTPException(status_code=404, detail="Document not found")
+    document = _get_owned_document(db, document_id, user_id)
     if document.status != DocumentStatus.PENDING:
         return document  # already finalized (or in flight) — idempotent on retry/double-click
 
@@ -132,24 +146,30 @@ def finalize_upload(
 
 
 @router.get("", response_model=list[DocumentOut])
-def list_documents(db: Session = Depends(get_db)) -> list[Document]:
-    return list(db.query(Document).order_by(Document.created_at.desc()).all())
+def list_documents(db: Session = Depends(get_db), user_id: str = Depends(get_current_user_id)) -> list[Document]:
+    return list(
+        db.query(Document)
+        .filter(Document.owner_id == user_id)
+        .order_by(Document.created_at.desc())
+        .all()
+    )
 
 
 @router.get("/{document_id}", response_model=DocumentOut)
-def get_document(document_id: str, db: Session = Depends(get_db)) -> Document:
-    document = db.get(Document, document_id)
-    if document is None:
-        raise HTTPException(status_code=404, detail="Document not found")
-    return document
+def get_document(
+    document_id: str, db: Session = Depends(get_db), user_id: str = Depends(get_current_user_id)
+) -> Document:
+    return _get_owned_document(db, document_id, user_id)
 
 
 @router.get("/{document_id}/file")
-def get_document_file(document_id: str, db: Session = Depends(get_db)) -> RedirectResponse:
+def get_document_file(
+    document_id: str, db: Session = Depends(get_db), user_id: str = Depends(get_current_user_id)
+) -> RedirectResponse:
     """Redirects to a fresh presigned GET URL rather than proxying bytes — downloads never
     route through the backend either, symmetric with the upload path."""
-    document = db.get(Document, document_id)
-    if document is None or document.status != DocumentStatus.READY:
+    document = _get_owned_document(db, document_id, user_id)
+    if document.status != DocumentStatus.READY:
         raise HTTPException(status_code=404, detail="File not found")
     url = s3.create_presigned_download(document.s3_key)
     return RedirectResponse(url=url, status_code=307)

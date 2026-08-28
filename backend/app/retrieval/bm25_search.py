@@ -16,6 +16,7 @@ def bm25_search(
     query: str,
     top_k: int,
     document_id: uuid.UUID | None = None,
+    owner_id: str | None = None,
 ) -> list[Chunk]:
     """Return the top_k chunks ranked by BM25 score against query, highest first.
 
@@ -26,6 +27,8 @@ def bm25_search(
     stmt = select(Chunk).join(Document).where(Document.status == DocumentStatus.READY)
     if document_id is not None:
         stmt = stmt.where(Chunk.document_id == document_id)
+    if owner_id is not None:
+        stmt = stmt.where(Document.owner_id == owner_id)
     candidates = list(db.scalars(stmt))
     if not candidates:
         return []

@@ -12,16 +12,19 @@ export default defineConfig({
   // properties of null (reading 'useContext')"). Forcing it into the initial scan avoids
   // the second pass entirely.
   optimizeDeps: {
-    include: ['framer-motion'],
+    include: ['framer-motion', 'react-router-dom'],
   },
   server: {
     port: process.env.PORT ? Number(process.env.PORT) : 5173,
     strictPort: true,
     proxy: {
+      // No path rewrite: the backend mounts everything under /api itself (app/main.py),
+      // matching Vercel's production rewrite (`/api/*` -> backend service), which passes
+      // the path through unchanged rather than stripping the prefix. Dev and prod need to
+      // agree on this or requests 404 in one of the two environments.
       '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },

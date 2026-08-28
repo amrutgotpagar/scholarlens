@@ -38,8 +38,11 @@ def _s3_client():
     return _client
 
 
-def build_object_key(document_id: uuid.UUID) -> str:
-    return f"uploads/{document_id}.pdf"
+def build_object_key(owner_id: str, document_id: uuid.UUID) -> str:
+    # Scoped by owner even though the IAM policy (uploads/*) doesn't require it —
+    # defense in depth: a leaked presigned URL or a bug in the ownership check on
+    # one endpoint still can't be used to guess another user's object key.
+    return f"uploads/{owner_id}/{document_id}.pdf"
 
 
 def create_presigned_upload(object_key: str, content_type: str) -> dict:

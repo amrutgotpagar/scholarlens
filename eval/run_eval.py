@@ -40,7 +40,7 @@ load_dotenv(PROJECT_ROOT / ".env")
 from app.config import get_settings  # noqa: E402
 from app.dependencies import get_generation_provider  # noqa: E402
 
-API_BASE = "http://localhost:8000"
+API_BASE = "http://localhost:8000/api"  # everything now mounts under /api — see app/main.py
 EVAL_DIR = Path(__file__).resolve().parent
 PAPERS_DIR = EVAL_DIR / "papers"
 DATASET_PATH = EVAL_DIR / "dataset.json"

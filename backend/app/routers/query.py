@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
+from app.auth import get_current_user_id
 from app.db.models import Chunk
 from app.db.session import get_db
 from app.dependencies import get_embedding_provider, get_generation_provider
@@ -21,6 +22,7 @@ def _retrieve(
     db: Session,
     embedding_provider: EmbeddingProvider,
     request: QueryRequest,
+    user_id: str,
 ) -> tuple[str, str, list[CitationOut]]:
     """Run retrieval + prompt construction, shared by the sync and streaming endpoints."""
     retrieve = hybrid_retrieve if request.retrieval_mode == "hybrid" else vector_only_retrieve
@@ -30,6 +32,7 @@ def _retrieve(
         query=request.question,
         document_id=request.document_id,
         top_k=request.top_k,
+        owner_id=user_id,
     )
 
     source_chunks = [
@@ -64,8 +67,9 @@ def query(
     db: Session = Depends(get_db),
     embedding_provider: EmbeddingProvider = Depends(get_embedding_provider),
     generation_provider: GenerationProvider = Depends(get_generation_provider),
+    user_id: str = Depends(get_current_user_id),
 ) -> QueryResponse:
-    system_prompt, user_prompt, citations = _retrieve(db, embedding_provider, request)
+    system_prompt, user_prompt, citations = _retrieve(db, embedding_provider, request, user_id)
     answer = generation_provider.generate(system_prompt, user_prompt)
     return QueryResponse(answer=answer, citations=citations)
 
@@ -80,11 +84,12 @@ def query_stream(
     db: Session = Depends(get_db),
     embedding_provider: EmbeddingProvider = Depends(get_embedding_provider),
     generation_provider: GenerationProvider = Depends(get_generation_provider),
+    user_id: str = Depends(get_current_user_id),
 ) -> StreamingResponse:
     # Retrieval happens before the StreamingResponse is constructed, so a failure here
     # (DB down, embedding call fails) still produces a normal JSON error response — only
     # generation failures, which happen after headers are sent, need the SSE "error" event.
-    system_prompt, user_prompt, citations = _retrieve(db, embedding_provider, request)
+    system_prompt, user_prompt, citations = _retrieve(db, embedding_provider, request, user_id)
 
     def event_stream():
         yield _sse("citations", {"citations": [c.model_dump(mode="json") for c in citations]})

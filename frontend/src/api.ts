@@ -1,6 +1,13 @@
 import type { Citation, DocumentOut, FeedbackRating } from './types'
+import { supabase } from './lib/supabaseClient'
 
 const API_BASE = '/api'
+
+async function authHeaders(): Promise<Record<string, string>> {
+  const { data } = await supabase.auth.getSession()
+  const token = data.session?.access_token
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
 
 async function parseErrorDetail(res: Response): Promise<string> {
   try {
@@ -12,7 +19,7 @@ async function parseErrorDetail(res: Response): Promise<string> {
 }
 
 export async function listDocuments(): Promise<DocumentOut[]> {
-  const res = await fetch(`${API_BASE}/documents`)
+  const res = await fetch(`${API_BASE}/documents`, { headers: await authHeaders() })
   if (!res.ok) throw new Error(await parseErrorDetail(res))
   return res.json()
 }
@@ -32,7 +39,7 @@ interface PresignResponse {
 export async function uploadDocument(file: File): Promise<DocumentOut> {
   const presignRes = await fetch(`${API_BASE}/documents/presign`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
     body: JSON.stringify({ filename: file.name, content_type: file.type }),
   })
   if (!presignRes.ok) throw new Error(await parseErrorDetail(presignRes))
@@ -44,6 +51,8 @@ export async function uploadDocument(file: File): Promise<DocumentOut> {
   }
   formData.append('file', file) // must be appended last per S3's presigned POST requirements
 
+  // Goes straight to S3, not our backend — no Authorization header needed (or wanted;
+  // S3 would just ignore it, the presigned POST fields are what authorize this request).
   const uploadRes = await fetch(presign.upload_url, { method: 'POST', body: formData })
   if (!uploadRes.ok) {
     throw new Error(`Upload to storage failed (${uploadRes.status})`)
@@ -51,6 +60,7 @@ export async function uploadDocument(file: File): Promise<DocumentOut> {
 
   const finalizeRes = await fetch(`${API_BASE}/documents/${presign.document_id}/finalize`, {
     method: 'POST',
+    headers: await authHeaders(),
   })
   if (!finalizeRes.ok) throw new Error(await parseErrorDetail(finalizeRes))
   return finalizeRes.json()
@@ -82,7 +92,7 @@ export async function* streamQuery(
 ): AsyncGenerator<QueryStreamEvent> {
   const res = await fetch(`${API_BASE}/query/stream`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
     body: JSON.stringify({ question, document_id: documentId }),
   })
   if (!res.ok || !res.body) {

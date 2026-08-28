@@ -58,6 +58,12 @@ class Settings(BaseSettings):
     rate_limit_requests: int = 30
     rate_limit_window_seconds: float = 60.0
 
+    # Supabase Auth. The JWT secret verifies the access token the frontend attaches
+    # to every request (see app/auth.py) — it's a shared HMAC secret, not the anon
+    # key, and lives only server-side. Project Settings -> API -> JWT Secret.
+    supabase_url: str = ""
+    supabase_jwt_secret: str = ""
+
     @property
     def active_embedding_dim(self) -> int:
         """The pgvector column width to use, based on whichever provider is active.

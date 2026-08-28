@@ -55,6 +55,11 @@ class Document(Base):
     # Where the file lives in S3 (uploads/{id}.pdf) — set at presign time, before the object
     # necessarily exists yet; the raw bytes never pass through this backend or this database.
     s3_key: Mapped[str] = mapped_column(String(512))
+    # Supabase auth.users.id. Nullable rather than NOT NULL so this migration can't fail
+    # against rows that predate auth — the application layer treats a null owner as
+    # invisible to everyone (every list/get query filters on owner_id = <caller>), so an
+    # orphaned row just becomes unreachable rather than the migration blocking on it.
+    owner_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True, index=True)
 
     chunks: Mapped[list["Chunk"]] = relationship(back_populates="document", cascade="all, delete-orphan")
 
