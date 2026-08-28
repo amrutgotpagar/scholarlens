@@ -17,6 +17,11 @@ const STATS = [
   { value: '$0', label: 'cost, free-tier providers' },
 ]
 
+const FIELD_VARIANTS = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 },
+}
+
 export default function AuthPage({ mode }: Props) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -76,15 +81,16 @@ export default function AuthPage({ mode }: Props) {
     <div className="premium-bg flex min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Branding panel */}
       <div className="relative hidden w-[42%] flex-col justify-between overflow-hidden bg-slate-900 p-10 text-white lg:flex">
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at 20% 15%, rgba(129,140,248,0.35), transparent 55%), radial-gradient(circle at 85% 85%, rgba(167,139,250,0.25), transparent 50%), radial-gradient(circle, rgba(255,255,255,0.14) 1px, transparent 1px)',
-            backgroundSize: 'auto, auto, 22px 22px',
-          }}
-        />
+        <div aria-hidden className="animate-ambient-drift absolute inset-0">
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage:
+                'radial-gradient(circle at 20% 15%, rgba(129,140,248,0.35), transparent 55%), radial-gradient(circle at 85% 85%, rgba(167,139,250,0.25), transparent 50%), radial-gradient(circle, rgba(255,255,255,0.14) 1px, transparent 1px)',
+              backgroundSize: 'auto, auto, 22px 22px',
+            }}
+          />
+        </div>
         <div
           aria-hidden
           className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-indigo-500/20 blur-3xl"
@@ -92,6 +98,12 @@ export default function AuthPage({ mode }: Props) {
         <div
           aria-hidden
           className="absolute -bottom-32 -left-16 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl"
+        />
+        {/* Torn-seam divider — the same "access pass" motif as the sign-in email,
+         * a signature detail rather than another gradient. */}
+        <div
+          aria-hidden
+          className="absolute inset-y-0 right-0 w-px border-r-2 border-dashed border-white/25"
         />
         <Link to="/" className="relative z-10 flex items-center gap-2 text-sm font-semibold tracking-tight">
           <Logomark size={28} className="shadow-md shadow-indigo-500/30" />
@@ -104,13 +116,17 @@ export default function AuthPage({ mode }: Props) {
           transition={{ duration: 0.6 }}
           className="relative z-10"
         >
+          <span className="font-serif text-6xl leading-none text-indigo-400/30 select-none">&ldquo;</span>
           <p className="font-serif text-3xl leading-snug text-white/95">
-            "Underline what matters, let the model do the skimming."
+            Underline what matters, let the model do the skimming.
           </p>
           <div className="mt-10 grid grid-cols-3 gap-6 border-t border-white/10 pt-6">
             {STATS.map((s) => (
               <div key={s.label}>
-                <div className="font-serif text-2xl text-white">{s.value}</div>
+                <div className="flex items-center gap-1.5">
+                  <span className="h-1 w-1 rounded-full bg-indigo-400" />
+                  <span className="font-serif text-2xl text-white">{s.value}</span>
+                </div>
                 <div className="mt-1 text-xs leading-tight text-white/50">{s.label}</div>
               </div>
             ))}
@@ -169,27 +185,33 @@ export default function AuthPage({ mode }: Props) {
                 </p>
               </motion.div>
             ) : (
-              <>
-                <MetalButton
-                  type="button"
-                  variant="primary"
-                  disabled={googleLoading}
-                  onClick={handleGoogleSignIn}
-                  className="mt-8 w-full"
-                >
-                  <GoogleIcon size={16} />
-                  {googleLoading ? 'Redirecting…' : 'Continue with Google'}
-                </MetalButton>
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={{ visible: { transition: { staggerChildren: 0.07, delayChildren: 0.1 } } }}
+              >
+                <motion.div variants={FIELD_VARIANTS}>
+                  <MetalButton
+                    type="button"
+                    variant="primary"
+                    disabled={googleLoading}
+                    onClick={handleGoogleSignIn}
+                    className="mt-8 w-full"
+                  >
+                    <GoogleIcon size={16} />
+                    {googleLoading ? 'Redirecting…' : 'Continue with Google'}
+                  </MetalButton>
+                </motion.div>
 
-                <div className="my-7 flex items-center gap-3">
+                <motion.div variants={FIELD_VARIANTS} className="my-7 flex items-center gap-3">
                   <span className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-200 dark:to-slate-800" />
                   <span className="text-xs font-medium tracking-wide text-slate-400 uppercase dark:text-slate-500">
                     or
                   </span>
                   <span className="h-px flex-1 bg-gradient-to-l from-transparent to-slate-200 dark:to-slate-800" />
-                </div>
+                </motion.div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <motion.form variants={FIELD_VARIANTS} onSubmit={handleSubmit} className="space-y-4">
                   {error && (
                     <div className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
                       {error}
@@ -212,7 +234,7 @@ export default function AuthPage({ mode }: Props) {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="you@university.edu"
-                        className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-3.5 pl-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500 dark:focus:ring-indigo-500/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-3.5 pl-10 text-sm text-slate-900 shadow-inner shadow-slate-900/[0.03] placeholder:text-slate-400 transition-shadow focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500 dark:shadow-black/10 dark:focus:ring-indigo-500/20"
                       />
                     </div>
                   </div>
@@ -234,7 +256,7 @@ export default function AuthPage({ mode }: Props) {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-3.5 pl-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500 dark:focus:ring-indigo-500/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-3.5 pl-10 text-sm text-slate-900 shadow-inner shadow-slate-900/[0.03] placeholder:text-slate-400 transition-shadow focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500 dark:shadow-black/10 dark:focus:ring-indigo-500/20"
                       />
                     </div>
                   </div>
@@ -249,8 +271,8 @@ export default function AuthPage({ mode }: Props) {
                       <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
                     )}
                   </MetalButton>
-                </form>
-              </>
+                </motion.form>
+              </motion.div>
             )}
           </div>
           </div>
