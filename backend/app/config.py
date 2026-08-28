@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -7,6 +8,19 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     database_url: str = "postgresql+psycopg://rag:rag@localhost:5432/rag"
+
+    @field_validator("database_url")
+    @classmethod
+    def _use_psycopg3_driver(cls, v: str) -> str:
+        # Supabase/most hosts hand out plain postgresql:// (or postgres://) connection
+        # strings, which SQLAlchemy resolves to the psycopg2 dialect by default — but
+        # this project only installs psycopg3 (requirements.txt: psycopg[binary]).
+        # Force the +psycopg driver regardless of what scheme the env var actually uses.
+        if v.startswith("postgresql://"):
+            return "postgresql+psycopg://" + v[len("postgresql://") :]
+        if v.startswith("postgres://"):
+            return "postgresql+psycopg://" + v[len("postgres://") :]
+        return v
 
     # "openai" (default, matches the spec'd stack), "ollama" (free local inference), or "nvidia"
     # (NVIDIA NIM's hosted OpenAI-compatible API, free developer credits). All three implement
