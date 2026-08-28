@@ -78,13 +78,15 @@ export function DocumentSidebar({
         >
           <div
             className={`flex h-9 w-9 items-center justify-center rounded-full transition-colors ${
-              dragOver ? 'bg-indigo-100 dark:bg-indigo-500/20' : 'bg-slate-100 dark:bg-slate-800'
+              dragOver || uploading
+                ? 'bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/25'
+                : 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500'
             }`}
           >
             {uploading ? (
-              <Loader2 size={17} className="animate-spin text-indigo-500" />
+              <Loader2 size={17} className="animate-spin" />
             ) : (
-              <UploadCloud size={17} className="text-slate-400 dark:text-slate-500" />
+              <UploadCloud size={17} />
             )}
           </div>
           <span className="text-[13px] font-medium text-slate-600 dark:text-slate-300">

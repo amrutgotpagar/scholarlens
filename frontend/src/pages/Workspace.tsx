@@ -52,7 +52,7 @@ export function Workspace() {
   const selectedDocumentLabel = selectedDocument ? selectedDocument.title ?? selectedDocument.filename : 'All documents'
 
   return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden bg-slate-100 dark:bg-black">
+    <div className="premium-bg flex h-screen w-screen flex-col overflow-hidden bg-slate-100 dark:bg-black">
       <TopBar documents={documents} />
       <div className="flex flex-1 gap-3 overflow-hidden p-3">
         <DocumentSidebar
