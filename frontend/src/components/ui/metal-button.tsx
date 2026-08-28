@@ -31,10 +31,17 @@ export interface MetalButtonProps extends React.ButtonHTMLAttributes<HTMLButtonE
   asChild?: boolean
   /** 'primary': white chrome fill. 'muted': translucent indigo fill, for secondary use. */
   variant?: 'primary' | 'muted'
+  size?: 'default' | 'sm' | 'lg'
+}
+
+const sizeStyles = {
+  default: 'gap-2 px-7 py-3 text-sm',
+  sm: 'gap-1.5 px-5 py-2 text-xs',
+  lg: 'gap-2.5 px-8 py-3.5 text-base',
 }
 
 export const MetalButton = React.forwardRef<HTMLButtonElement, MetalButtonProps>(
-  ({ className, variant = 'primary', asChild = false, children, ...props }, ref) => {
+  ({ className, variant = 'primary', size = 'default', asChild = false, children, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button'
     const magnetic = useMagnetic()
 
@@ -47,31 +54,37 @@ export const MetalButton = React.forwardRef<HTMLButtonElement, MetalButtonProps>
         whileTap={{ scale: 0.97 }}
         className={cn('group inline-block', className)}
       >
-        <Comp ref={ref} {...props}>
-          <div
-            className="relative w-full overflow-hidden rounded-full shadow-[0_20px_50px_-12px_rgba(79,70,229,0.45)]"
-            style={{ padding: 3 }}
+        {/* The chrome ring (shader + padding) wraps Comp rather than the other way
+         * round — Comp's only child is {children} itself (the caller's Link/text),
+         * exactly like LiquidButton. Radix's Slot merges its props onto whatever
+         * single child it's given, so nesting {children} any deeper here would
+         * merge onto a decorative wrapper div instead of the real link/button. */}
+        <div
+          className="relative overflow-hidden rounded-full shadow-[0_20px_50px_-12px_rgba(79,70,229,0.45)]"
+          style={{ padding: 3 }}
+        >
+          <LiquidMetal
+            colorBack="#2e2470"
+            colorTint="#e3d9ff"
+            speed={0.4}
+            repetition={4}
+            distortion={0.15}
+            className="absolute inset-0 z-0 rounded-full"
+          />
+          <Comp
+            ref={ref}
+            className={cn(
+              'relative z-10 flex items-center justify-center rounded-full font-semibold whitespace-nowrap transition-colors duration-200 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+              sizeStyles[size],
+              variant === 'muted'
+                ? 'bg-indigo-950/85 text-indigo-100 group-hover:bg-indigo-900/85'
+                : 'bg-white text-slate-900 group-hover:bg-slate-50',
+            )}
+            {...props}
           >
-            <LiquidMetal
-              colorBack="#2e2470"
-              colorTint="#e3d9ff"
-              speed={0.4}
-              repetition={4}
-              distortion={0.15}
-              className="absolute inset-0 z-0 rounded-full"
-            />
-            <div
-              className={cn(
-                'relative z-10 flex w-full items-center justify-center gap-2 rounded-full px-7 py-3 text-sm font-semibold whitespace-nowrap transition-colors duration-200',
-                variant === 'muted'
-                  ? 'bg-indigo-950/85 text-indigo-100 group-hover:bg-indigo-900/85'
-                  : 'bg-white text-slate-900 group-hover:bg-slate-50',
-              )}
-            >
-              {children}
-            </div>
-          </div>
-        </Comp>
+            {children}
+          </Comp>
+        </div>
       </motion.div>
     )
   },

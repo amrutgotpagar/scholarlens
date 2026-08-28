@@ -13,7 +13,9 @@ interface LiquidMetalProps {
 }
 
 /** A thin, real-time WebGL liquid-metal shader (not a CSS gradient) — same
- * effect ScholarLens's RFE sibling project uses for its "chrome" button ring. */
+ * effect, and the same params, as ScholarLens's RFE sibling project's
+ * ButtonChrome/LiquidMetal (RFE's own live button uses this exact
+ * distortion/shiftRed/shiftBlue combination without issue). */
 export const LiquidMetal = memo(function LiquidMetal({
   colorBack = '#aaaaac',
   colorTint = '#ffffff',
