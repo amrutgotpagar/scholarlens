@@ -6,6 +6,7 @@ import type { Citation } from '../types'
 import { AnswerActions } from './AnswerActions'
 import { AnswerText } from './AnswerText'
 import { FollowUps } from './FollowUps'
+import { ShiningText } from './ShiningText'
 import { SourcesPanel } from './SourcesPanel'
 
 const EXAMPLE_PROMPTS = [
@@ -179,16 +180,9 @@ export function QueryPanel({ selectedDocumentId, selectedDocumentLabel, hasDocum
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex items-center gap-1.5 py-1 text-slate-400 dark:text-slate-500"
+              className="py-1"
             >
-              {[0, 1, 2].map((i) => (
-                <motion.span
-                  key={i}
-                  className="h-1.5 w-1.5 rounded-full bg-current"
-                  animate={{ y: [0, -4, 0], opacity: [0.4, 1, 0.4] }}
-                  transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.15, ease: 'easeInOut' }}
-                />
-              ))}
+              <ShiningText text="Reading the sources…" />
             </motion.div>
           )}
         </AnimatePresence>
