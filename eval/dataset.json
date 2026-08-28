@@ -1,0 +1,208 @@
+[
+  {
+    "id": "attn-1",
+    "paper": "attention",
+    "question": "What BLEU score does the Transformer achieve on the WMT 2014 English-to-German translation task?",
+    "expected_answer": "28.4 BLEU, improving over the existing best results (including ensembles) by over 2 BLEU.",
+    "expected_page": 1
+  },
+  {
+    "id": "attn-2",
+    "paper": "attention",
+    "question": "What BLEU score does the Transformer achieve on the WMT 2014 English-to-French translation task?",
+    "expected_answer": "41.8 BLEU, a new single-model state of the art, after training for 3.5 days on eight GPUs.",
+    "expected_page": 1
+  },
+  {
+    "id": "attn-3",
+    "paper": "attention",
+    "question": "How many identical layers are in the Transformer's encoder stack?",
+    "expected_answer": "6 identical layers (N = 6).",
+    "expected_page": 3
+  },
+  {
+    "id": "attn-4",
+    "paper": "attention",
+    "question": "What is the dimensionality of the Transformer's internal representations, d_model?",
+    "expected_answer": "512.",
+    "expected_page": 3
+  },
+  {
+    "id": "attn-5",
+    "paper": "attention",
+    "question": "How many parallel attention heads does the Transformer use in multi-head attention?",
+    "expected_answer": "8 heads (h = 8), each with d_k = d_v = 64.",
+    "expected_page": 5
+  },
+  {
+    "id": "attn-6",
+    "paper": "attention",
+    "question": "What positional encoding function does the Transformer use to inject sequence order information?",
+    "expected_answer": "Sine and cosine functions of different frequencies.",
+    "expected_page": 6
+  },
+  {
+    "id": "attn-7",
+    "paper": "attention",
+    "question": "On what hardware and for how long was the base Transformer model trained?",
+    "expected_answer": "8 NVIDIA P100 GPUs, for 12 hours (100,000 training steps). The bigger model variant was trained longer, for 3.5 days (300,000 steps), on the same hardware.",
+    "expected_page": 7
+  },
+  {
+    "id": "bert-1",
+    "paper": "bert",
+    "question": "What GLUE score does BERT achieve, and by how much does it improve over the prior state of the art?",
+    "expected_answer": "80.5%, a 7.7 point absolute improvement.",
+    "expected_page": 1
+  },
+  {
+    "id": "bert-2",
+    "paper": "bert",
+    "question": "What are the two pre-training tasks used to train BERT?",
+    "expected_answer": "A masked language model (MLM) and a next sentence prediction (NSP) task.",
+    "expected_page": 2
+  },
+  {
+    "id": "bert-3",
+    "paper": "bert",
+    "question": "What percentage of input tokens are masked at random during BERT's masked language model pre-training?",
+    "expected_answer": "15% of all WordPiece tokens in each sequence.",
+    "expected_page": 4
+  },
+  {
+    "id": "bert-4",
+    "paper": "bert",
+    "question": "What is the configuration of BERT_BASE in terms of layers, hidden size, attention heads, and total parameters?",
+    "expected_answer": "L=12 layers, H=768 hidden size, A=12 attention heads, 110M total parameters.",
+    "expected_page": 3
+  },
+  {
+    "id": "bert-5",
+    "paper": "bert",
+    "question": "What two corpora were used for BERT's pre-training data?",
+    "expected_answer": "BooksCorpus (800M words) and English Wikipedia (2,500M words).",
+    "expected_page": 5
+  },
+  {
+    "id": "bert-6",
+    "paper": "bert",
+    "question": "What vocabulary size does BERT's WordPiece embeddings use?",
+    "expected_answer": "30,000 tokens.",
+    "expected_page": 4
+  },
+  {
+    "id": "bert-7",
+    "paper": "bert",
+    "question": "What special token is used as the aggregate sequence representation for classification tasks in BERT?",
+    "expected_answer": "The [CLS] token.",
+    "expected_page": 4
+  },
+  {
+    "id": "resnet-1",
+    "paper": "resnet",
+    "question": "What is the maximum depth of the residual networks evaluated on ImageNet in this paper?",
+    "expected_answer": "Up to 152 layers.",
+    "expected_page": 1
+  },
+  {
+    "id": "resnet-2",
+    "paper": "resnet",
+    "question": "What error rate did the ensemble of residual nets achieve on the ImageNet test set, and what did it win?",
+    "expected_answer": "3.57% error, winning 1st place on the ILSVRC 2015 classification task.",
+    "expected_page": 1
+  },
+  {
+    "id": "resnet-3",
+    "paper": "resnet",
+    "question": "What relative improvement did the deep residual representations provide on the COCO object detection dataset?",
+    "expected_answer": "A 28% relative improvement.",
+    "expected_page": 1
+  },
+  {
+    "id": "resnet-4",
+    "paper": "resnet",
+    "question": "What is the core mathematical idea behind a residual building block?",
+    "expected_answer": "Instead of learning an unreferenced mapping H(x), the stacked layers learn a residual mapping F(x) := H(x) - x, so the original mapping is recast as F(x) + x.",
+    "expected_page": 2
+  },
+  {
+    "id": "resnet-5",
+    "paper": "resnet",
+    "question": "Besides ImageNet, what other dataset did the paper analyze networks with 100 and 1000 layers on?",
+    "expected_answer": "CIFAR-10.",
+    "expected_page": 1
+  },
+  {
+    "id": "resnet-6",
+    "paper": "resnet",
+    "question": "How much deeper are the evaluated residual nets compared to VGG nets?",
+    "expected_answer": "8x deeper.",
+    "expected_page": 1
+  },
+  {
+    "id": "gan-1",
+    "paper": "gan",
+    "question": "What two models are simultaneously trained in the generative adversarial network framework?",
+    "expected_answer": "A generative model G that captures the data distribution, and a discriminative model D that estimates the probability a sample came from the training data rather than G.",
+    "expected_page": 1
+  },
+  {
+    "id": "gan-2",
+    "paper": "gan",
+    "question": "At the theoretical optimum of the GAN minimax game, what does the discriminator D output everywhere?",
+    "expected_answer": "1/2 everywhere, unable to distinguish real from generated samples, while G recovers the training data distribution.",
+    "expected_page": 1
+  },
+  {
+    "id": "gan-3",
+    "paper": "gan",
+    "question": "What is the value function V(D, G) in the GAN minimax game?",
+    "expected_answer": "V(D,G) = E_x~pdata[log D(x)] + E_z~pz[log(1 - D(G(z)))].",
+    "expected_page": 3
+  },
+  {
+    "id": "gan-4",
+    "paper": "gan",
+    "question": "Does training a generative adversarial network require Markov chains or unrolled approximate inference networks?",
+    "expected_answer": "No — neither Markov chains nor unrolled approximate inference networks are needed during training or sample generation.",
+    "expected_page": 1
+  },
+  {
+    "id": "gan-5",
+    "paper": "gan",
+    "question": "What alternative training objective for G is proposed to provide stronger gradients early in learning?",
+    "expected_answer": "Train G to maximize log D(G(z)) instead of minimizing log(1 - D(G(z))).",
+    "expected_page": 3
+  },
+  {
+    "id": "gan-6",
+    "paper": "gan",
+    "question": "In practice, how are D and G optimized relative to each other during training?",
+    "expected_answer": "They alternate: k steps of optimizing D, then one step of optimizing G.",
+    "expected_page": 3
+  },
+  {
+    "id": "cross-1",
+    "paper": null,
+    "expected_paper": "attention",
+    "question": "Which paper introduces the Transformer architecture, dispensing with recurrence and convolutions entirely?",
+    "expected_answer": "\"Attention Is All You Need.\"",
+    "expected_page": 1
+  },
+  {
+    "id": "cross-2",
+    "paper": null,
+    "expected_paper": "resnet",
+    "question": "Which paper achieves 3.57% error on ImageNet using very deep networks with residual connections?",
+    "expected_answer": "\"Deep Residual Learning for Image Recognition.\"",
+    "expected_page": 1
+  },
+  {
+    "id": "cross-3",
+    "paper": null,
+    "expected_paper": "gan",
+    "question": "Which paper's generator and discriminator play a minimax two-player game?",
+    "expected_answer": "\"Generative Adversarial Nets.\"",
+    "expected_page": 1
+  }
+]

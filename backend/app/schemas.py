@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -22,6 +23,9 @@ class QueryRequest(BaseModel):
     question: str = Field(min_length=1, max_length=2000)
     document_id: uuid.UUID | None = None
     top_k: int | None = Field(default=None, ge=1, le=20)
+    # Exposed for the Phase 3 eval harness to compare configs (see eval/run_eval.py); the
+    # frontend never sets this and always gets the default hybrid behavior.
+    retrieval_mode: Literal["hybrid", "vector_only"] = "hybrid"
 
 
 class CitationOut(BaseModel):

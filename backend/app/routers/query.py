@@ -10,7 +10,7 @@ from app.db.session import get_db
 from app.dependencies import get_embedding_provider, get_generation_provider
 from app.llm.base import EmbeddingProvider, GenerationProvider
 from app.prompts import SourceChunk, build_prompt
-from app.retrieval.pipeline import hybrid_retrieve
+from app.retrieval.pipeline import hybrid_retrieve, vector_only_retrieve
 from app.schemas import CitationOut, QueryRequest, QueryResponse
 
 router = APIRouter(prefix="/query", tags=["query"])
@@ -23,7 +23,8 @@ def _retrieve(
     request: QueryRequest,
 ) -> tuple[str, str, list[CitationOut]]:
     """Run retrieval + prompt construction, shared by the sync and streaming endpoints."""
-    chunks: list[Chunk] = hybrid_retrieve(
+    retrieve = hybrid_retrieve if request.retrieval_mode == "hybrid" else vector_only_retrieve
+    chunks: list[Chunk] = retrieve(
         db=db,
         embedding_provider=embedding_provider,
         query=request.question,
