@@ -11,15 +11,19 @@ export function TopBar({ documents }: Props) {
   const totalPages = documents.reduce((sum, d) => sum + (d.page_count ?? 0), 0)
 
   return (
-    <header className="relative z-10 flex shrink-0 items-center justify-between overflow-hidden border-b border-slate-200/70 bg-white/60 px-5 py-3 backdrop-blur-md dark:border-slate-800/70 dark:bg-slate-950/50">
-      <div
-        aria-hidden
-        className="animate-ambient-drift pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage:
-            'radial-gradient(ellipse 420px 120px at 12% 0%, rgba(99,102,241,0.09), transparent 70%), radial-gradient(ellipse 300px 100px at 88% 100%, rgba(167,139,250,0.07), transparent 70%)',
-        }}
-      />
+    <header className="relative z-10 flex shrink-0 items-center justify-between border-b border-slate-200/70 bg-white/60 px-5 py-3 backdrop-blur-md dark:border-slate-800/70 dark:bg-slate-950/50">
+      {/* overflow-hidden lives on this wrapper, not the header itself - the header
+       * also hosts the account dropdown, which renders below the header's own
+       * bottom edge and would get clipped by an overflow-hidden set any higher. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div
+          className="animate-ambient-drift absolute inset-0"
+          style={{
+            backgroundImage:
+              'radial-gradient(ellipse 420px 120px at 12% 0%, rgba(99,102,241,0.09), transparent 70%), radial-gradient(ellipse 300px 100px at 88% 100%, rgba(167,139,250,0.07), transparent 70%)',
+          }}
+        />
+      </div>
       <div className="relative flex items-center gap-2.5">
         <Logomark size={32} className="shadow-md shadow-indigo-500/30" />
         <div>

@@ -105,9 +105,21 @@ export function QueryPanel({ selectedDocumentId, selectedDocumentLabel, hasDocum
             <div className="flex flex-col items-center gap-4">
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.35, ease: 'easeOut' }}
-                className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/25"
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  boxShadow: [
+                    '0 10px 30px -8px rgba(99,102,241,0.35)',
+                    '0 10px 40px -6px rgba(99,102,241,0.55)',
+                    '0 10px 30px -8px rgba(99,102,241,0.35)',
+                  ],
+                }}
+                transition={{
+                  opacity: { duration: 0.35, ease: 'easeOut' },
+                  scale: { duration: 0.35, ease: 'easeOut' },
+                  boxShadow: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+                }}
+                className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 text-white"
               >
                 <Sparkles size={26} />
               </motion.div>

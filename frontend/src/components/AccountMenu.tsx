@@ -4,8 +4,23 @@ import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabaseClient'
 
-function initialFrom(text: string): string {
-  return text.trim().charAt(0).toUpperCase() || '?'
+/** A solid person-silhouette glyph (head + shoulders) rather than a bare
+ * initial letter or a generic outline icon — reads as an actual avatar for
+ * accounts with no photo (email/password sign-ups), the way Slack/Discord's
+ * default avatars do. */
+function PersonGlyph({ size }: { size: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <circle cx="12" cy="8.5" r="3.5" fill="white" fillOpacity="0.95" />
+      <path
+        d="M4.5 20c0-4.142 3.358-6.5 7.5-6.5s7.5 2.358 7.5 6.5"
+        stroke="white"
+        strokeOpacity="0.95"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
 }
 
 export function AccountMenu() {
@@ -63,8 +78,8 @@ export function AccountMenu() {
             className="h-7 w-7 shrink-0 rounded-full ring-2 ring-white shadow-sm dark:ring-slate-900"
           />
         ) : (
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-[12px] font-semibold text-white shadow-sm ring-2 ring-white dark:ring-slate-900">
-            {initialFrom(displayName ?? email)}
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 shadow-sm ring-2 ring-white dark:ring-slate-900">
+            <PersonGlyph size={16} />
           </span>
         )}
         <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.15 }}>
@@ -91,8 +106,8 @@ export function AccountMenu() {
                   className="h-9 w-9 shrink-0 rounded-full ring-2 ring-white shadow-sm dark:ring-slate-900"
                 />
               ) : (
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-[13px] font-semibold text-white shadow-sm">
-                  {initialFrom(displayName ?? email)}
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 shadow-sm">
+                  <PersonGlyph size={20} />
                 </span>
               )}
               <div className="min-w-0">
