@@ -269,8 +269,12 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CTA — the document stack visual gives "upload a paper" something to look at. */}
-      <section className="relative overflow-hidden bg-slate-950 px-6 py-24 sm:px-10 sm:py-32">
+      {/* CTA — the document stack visual gives "upload a paper" something to look at.
+          bg-slate-900, not -950: the footer directly beneath is -950 and slides up
+          over this section (sticky-reveal) — same shade would erase the seam between
+          them, so the footer's nav links would visually blend into this section and
+          look like orphaned floating text rather than the footer arriving. */}
+      <section className="relative overflow-hidden bg-slate-900 px-6 py-24 sm:px-10 sm:py-32">
         <div
           aria-hidden
           className="absolute inset-0"
