@@ -4,6 +4,7 @@ import { GrainOverlay } from './components/GrainOverlay'
 import { RequireAuth } from './components/RequireAuth'
 import { LiquidGlassFilterDefs } from './components/ui/liquid-button'
 import Landing from './pages/Landing'
+import NotFound from './pages/NotFound'
 import { Workspace } from './pages/Workspace'
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
         />
         <Route path="/sign-in" element={<AuthPage mode="sign-in" />} />
         <Route path="/sign-up" element={<AuthPage mode="sign-up" />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   )

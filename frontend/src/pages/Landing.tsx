@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import {
@@ -20,6 +20,7 @@ import { RetrievalGraph3D } from '../components/RetrievalGraph3D'
 import { RevealHeading } from '../components/RevealHeading'
 import { ScrollScrubber } from '../components/ScrollScrubber'
 import { TiltCard } from '../components/TiltCard'
+import { LiquidText } from '../components/ui/liquid-text'
 import { MetalButton } from '../components/ui/metal-button'
 
 const PAPERS = [
@@ -61,7 +62,29 @@ const FLOW = [
   { icon: Sparkles, title: 'Stream', body: 'The grounded answer arrives token by token.' },
 ]
 
+// Matches the hero h1's own breakpoints (text-4xl / sm:text-6xl / md:text-7xl) so the
+// shader-filled word sits at the same size as the plain-text words around it.
+function useHeroWordSize() {
+  const [size, setSize] = useState(36)
+
+  useEffect(() => {
+    const sm = window.matchMedia('(min-width: 640px)')
+    const md = window.matchMedia('(min-width: 768px)')
+    const update = () => setSize(md.matches ? 72 : sm.matches ? 60 : 36)
+    update()
+    sm.addEventListener('change', update)
+    md.addEventListener('change', update)
+    return () => {
+      sm.removeEventListener('change', update)
+      md.removeEventListener('change', update)
+    }
+  }, [])
+
+  return size
+}
+
 export default function Landing() {
+  const heroWordSize = useHeroWordSize()
   const scrubContainerRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: scrubContainerRef,
@@ -89,7 +112,13 @@ export default function Landing() {
             style={{ opacity: titleOpacity, y: titleY }}
             className="font-serif text-4xl leading-[1.1] font-semibold text-white text-shadow-lg sm:text-6xl md:text-7xl"
           >
-            Underline what matters.
+            Underline what{' '}
+            <LiquidText
+              text="matters."
+              fontSize={heroWordSize}
+              paddingX={heroWordSize / 3}
+              className="align-baseline"
+            />
           </motion.h1>
           <motion.p
             style={{ opacity: subtitleOpacity }}
