@@ -1,0 +1,197 @@
+<title>Sign-In Pass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,500;0,8..60,600;1,8..60,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #eeecf6;
+    --ink: #17112b;
+    --ink-2: #241a3d;
+    --card: #ffffff;
+    --indigo: #4f46e5;
+    --violet: #7c3aed;
+    --muted: #6f6b85;
+    --hairline: #e6e2f2;
+    --note-bg: #f6f5fb;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  .stage {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 64px 20px 80px;
+    gap: 22px;
+  }
+  .stage-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .frame {
+    width: 100%;
+    max-width: 460px;
+  }
+  /* ===== email-safe markup below (this is what ships to Supabase) ===== */
+  .card {
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--hairline);
+    box-shadow: 0 30px 60px -24px rgba(23, 17, 43, 0.35);
+  }
+  .stub {
+    background-color: var(--ink);
+    background-image:
+      radial-gradient(ellipse 320px 200px at 15% -10%, rgba(129,140,248,0.28), transparent 60%),
+      radial-gradient(ellipse 260px 200px at 100% 110%, rgba(168,85,247,0.22), transparent 60%),
+      linear-gradient(165deg, var(--ink-2), var(--ink));
+    padding: 40px 40px 30px;
+    text-align: center;
+  }
+  .mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #f2f0fb;
+    letter-spacing: 0.3px;
+  }
+  .mark-glyph {
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #818cf8, #c084fc);
+    display: inline-block;
+  }
+  .stub-line {
+    margin: 18px auto 0;
+    max-width: 280px;
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 1.55;
+    color: rgba(242, 240, 251, 0.68);
+  }
+  .tear {
+    border-top: 2px dashed rgba(255,255,255,0.16);
+    background-color: var(--ink);
+  }
+  .body {
+    background: var(--card);
+    padding: 40px 40px 36px;
+  }
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--violet);
+    margin: 0 0 14px;
+  }
+  h1 {
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-weight: 600;
+    font-size: 27px;
+    line-height: 1.25;
+    letter-spacing: -0.2px;
+    color: var(--ink);
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+  p.copy {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--muted);
+    margin: 0 0 30px;
+    max-width: 40ch;
+  }
+  .cta {
+    display: inline-block;
+    padding: 15px 30px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--indigo), var(--violet));
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.2px;
+    text-decoration: none;
+    box-shadow: 0 16px 30px -12px rgba(79, 70, 229, 0.55);
+  }
+  .code-row {
+    margin-top: 34px;
+    padding-top: 26px;
+    border-top: 1px solid var(--hairline);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .code-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .code-value {
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 5px;
+    color: var(--ink);
+    background: var(--note-bg);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    padding: 9px 16px;
+  }
+  .note {
+    margin: 26px 0 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #9490a8;
+  }
+  .footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.2px;
+  }
+</style>
+
+<div class="stage">
+  <div class="stage-label">Inbox preview &middot; Gmail / Apple Mail rendering</div>
+  <div class="frame">
+    <div class="card">
+      <div class="stub">
+        <span class="mark"><span class="mark-glyph"></span>ScholarLens</span>
+        <p class="stub-line">&ldquo;Underline what matters, let the model do the skimming.&rdquo;</p>
+      </div>
+      <div class="tear"></div>
+      <div class="body">
+        <p class="eyebrow">Sign-in request</p>
+        <h1>Welcome back.</h1>
+        <p class="copy">Click below to continue to ScholarLens. This link is valid for one use and expires shortly.</p>
+        <a href="#" class="cta" onclick="return false;">Sign in to ScholarLens &nbsp;&rarr;</a>
+        <div class="code-row">
+          <span class="code-label">Or enter code</span>
+          <span class="code-value">482 917</span>
+        </div>
+        <p class="note">Didn&rsquo;t request this? You can safely ignore this email.</p>
+      </div>
+    </div>
+    <p class="footer">ScholarLens &nbsp;&middot;&nbsp; Grounded, cited Q&amp;A over your arXiv papers</p>
+  </div>
+</div>

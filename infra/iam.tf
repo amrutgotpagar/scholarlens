@@ -2,11 +2,12 @@
 # the rag-arxiv-qa-terraform user this config is applied with (that one needs broad S3 access
 # to provision the bucket itself; the app only ever needs to read/write/delete objects in it).
 #
-# Static access keys are this build's local-dev stand-in. In a real ECS deployment (Phase 5)
-# this would be an IAM role attached to the task instead — no long-lived secret to rotate or
-# leak at all. Note also that the resulting secret access key is stored in Terraform state;
-# for anything beyond local/portfolio use, state should live in an encrypted remote backend
-# (S3 + DynamoDB locking), not as a local file.
+# Static access keys are this build's local-dev stand-in. Phase 5's ECS deployment
+# (see ecs.tf: aws_iam_role.ecs_task) uses an IAM role attached to the task instead —
+# no long-lived secret to rotate or leak at all; this user/key pair still exists purely
+# for docker-compose/local dev. Note also that the resulting secret access key is stored
+# in Terraform state; for anything beyond local/portfolio use, state should live in an
+# encrypted remote backend (S3 + DynamoDB locking), not as a local file.
 
 resource "aws_iam_user" "app" {
   name = "rag-arxiv-qa-app"
