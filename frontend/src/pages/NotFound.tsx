@@ -1,6 +1,9 @@
+import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
+import { CornerFrame } from '../components/CornerFrame'
 import { Logomark } from '../components/Logomark'
+import { RevealHeading } from '../components/RevealHeading'
 import { LiquidButton } from '../components/ui/liquid-button'
 
 /** A large ghost mark behind the copy — decorative only, tinted to a barely-there
@@ -23,33 +26,85 @@ function GhostMark() {
   )
 }
 
+const CONTAINER = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } },
+}
+
+const RISE = {
+  hidden: { opacity: 0, y: 14 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const } },
+}
+
 export default function NotFound() {
   const navigate = useNavigate()
 
   return (
     <div className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-slate-50 px-4 py-16 text-slate-900 md:px-20 md:py-24 dark:bg-slate-950 dark:text-slate-100">
-      <Link
-        to="/"
-        className="absolute top-6 left-6 flex items-center gap-2 text-sm font-medium text-slate-500 transition-colors hover:text-slate-900 md:top-10 md:left-10 dark:text-slate-400 dark:hover:text-white"
-      >
-        <Logomark size={24} />
-        ScholarLens
-      </Link>
+      {/* Ambient wash behind the mark — the same "spotlight" treatment as Landing's
+          CTA section, so a bare 404 doesn't read as flatter than the rest of the site. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            'radial-gradient(ellipse 900px 560px at 50% 42%, rgba(99,102,241,0.1), transparent 60%)',
+        }}
+      />
 
-      <div className="absolute inset-0 hidden items-center justify-center px-20 py-24 md:flex">
-        <GhostMark />
+      <div className="text-slate-300 dark:text-indigo-500/20">
+        <CornerFrame size={22} inset={20} alwaysOn className="md:inset-6" />
       </div>
 
-      <div className="z-10 flex flex-col items-center justify-center gap-8 md:gap-12">
-        <div className="flex flex-col items-center justify-center gap-4 md:gap-6">
-          <h1 className="text-center font-serif text-4xl font-semibold md:text-6xl">
-            We lost this page
-          </h1>
-          <p className="max-w-md text-center text-lg text-slate-500 md:text-xl dark:text-slate-400">
-            The page you're looking for doesn't exist or has been moved.
-          </p>
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <Link
+          to="/"
+          className="absolute top-6 left-6 flex items-center gap-2 text-sm font-medium text-slate-500 transition-colors hover:text-slate-900 md:top-10 md:left-10 dark:text-slate-400 dark:hover:text-white"
+        >
+          <Logomark size={24} />
+          ScholarLens
+        </Link>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.94 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
+        className="absolute inset-0 hidden items-center justify-center px-20 py-24 md:flex"
+      >
+        <div className="animate-ambient-drift">
+          <GhostMark />
         </div>
-        <div className="flex w-full flex-col items-center justify-center gap-3 md:w-fit md:flex-row">
+      </motion.div>
+
+      <motion.div
+        variants={CONTAINER}
+        initial="hidden"
+        animate="visible"
+        className="z-10 flex flex-col items-center justify-center gap-8 md:gap-12"
+      >
+        <div className="flex flex-col items-center justify-center gap-4 md:gap-6">
+          <RevealHeading
+            as="h1"
+            text="We lost this page"
+            className="text-center font-serif text-4xl font-semibold md:text-6xl"
+            delay={0.15}
+          />
+          <motion.p
+            variants={RISE}
+            className="max-w-md text-center text-lg text-slate-500 md:text-xl dark:text-slate-400"
+          >
+            The page you're looking for doesn't exist or has been moved.
+          </motion.p>
+        </div>
+        <motion.div
+          variants={RISE}
+          className="flex w-full flex-col items-center justify-center gap-3 md:w-fit md:flex-row"
+        >
           <LiquidButton
             variant="light"
             size="lg"
@@ -61,8 +116,8 @@ export default function NotFound() {
           <LiquidButton asChild variant="indigo" size="lg" className="w-full md:w-fit">
             <Link to="/">Go home</Link>
           </LiquidButton>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   )
 }
